@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+"http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings cacheModelsEnabled="false" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="40" maxSessions="20"
+		maxTransactions="5" useStatementNamespaces="true" />
+		
+	<typeAlias alias="Category" type="com.naver.timetable.model.Category" />
+
+	<sqlMap resource="ibatis/Category.xml" />
+	<sqlMap resource="ibatis/Code.xml" />
+	<sqlMap resource="ibatis/ClassInfo.xml" />
+</sqlMapConfig>
+

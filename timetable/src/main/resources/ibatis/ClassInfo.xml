@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap>
+	<delete id="clearLecture">
+		DELETE
+		FROM hufs_lecture
+	</delete>
+	
+	<delete id="clearLectureSche">
+		DELETE
+		FROM hufs_lecture_sche
+	</delete>
+	
+    <insert id="saveClassInfoList" parameterClass="java.util.List">	
+    	INSERT
+    	INTO hufs_lecture(lecture_num, lecture_name, grade, point, prof, room, cyber, native, url, catg_id)
+    	VALUES
+		<iterate conjunction=",">
+			(#[].classNum#, #[].className#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#)
+		</iterate>
+    </insert>
+    
+    
+    <insert id="saveTimeList" parameterClass="java.util.List">	
+    	INSERT
+    	INTO hufs_lecture_sche(lecture_num, week_day)
+    	VALUES
+		<iterate conjunction=",">
+			(#[].classNum#, #[].weekDay#)
+		</iterate>
+    </insert>
+    
+</sqlMap>

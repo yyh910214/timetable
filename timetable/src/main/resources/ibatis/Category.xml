@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap>
+    <insert id="insertCategories" parameterClass="java.util.List">	
+    	INSERT
+    	INTO hufs_catg(catg_id, catg_name, campus_code, gubun)
+    	VALUES
+		<iterate conjunction=",">
+			(#[].categoryId#, #[].categoryName#, #[].categoryCampus#, #[].categoryGubun#)
+		</iterate>
+    </insert>
+    
+    <select id="getCatgCode" parameterClass="java.util.Map" resultClass="java.lang.String">	
+    	SELECT catg_id
+		FROM hufs_catg
+        WHERE gubun = #majorCode# AND campus_code = #campusCode#
+    </select>
+    
+
+</sqlMap>

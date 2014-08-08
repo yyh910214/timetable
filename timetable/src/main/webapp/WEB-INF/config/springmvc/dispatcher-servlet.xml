@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/data/neo4j http://www.springframework.org/schema/data/neo4j/spring-neo4j-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+<!-- 	<context:annotation-config/> -->
+    <context:component-scan base-package="com.naver.timetable" />
+<!--     <context:spring-configured/> -->
+
+	<!-- Configures support for @Controllers -->
+<!-- 	<mvc:annotation-driven content-negotiation-manager="contentManager"> -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+
+	
+<!-- 	<bean id="contentManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"> -->
+<!--             <property name="favorPathExtension" value="true"/> -->
+<!--             <property name="ignoreAcceptHeader" value="true" /> -->
+<!--             <property name="defaultContentType" value="text/html" /> -->
+<!--             <property name="useJaf" value="false"/> -->
+<!--             <property name="mediaTypes"> -->
+<!--                 <map> -->
+<!--                     <entry key="html" value="text/html" /> -->
+<!--                     <entry key="txt" value="text/plain" /> -->
+<!--                     <entry key="json" value="application/json" /> -->
+<!--                     <entry key="xml" value="application/xml" /> -->
+<!--                 </map> -->
+<!--             </property> -->
+<!--     </bean> -->
+
+<!-- 	<context:component-scan base-package="com.naver.nn"> -->
+<!-- 		<context:include-filter type="annotation" -->
+<!-- 			expression="org.springframework.stereotype.Controller" /> -->
+<!-- 		<context:include-filter type="annotation" -->
+<!-- 			expression="org.springframework.stereotype.Service" /> -->
+<!-- 		<context:include-filter type="annotation" -->
+<!-- 			expression="org.springframework.stereotype.Repository" /> -->
+<!-- 	</context:component-scan> -->
+
+	<bean id="jspViewResolver"
+		class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="cache" value="false" />
+	</bean>
+
+<!-- 	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator">  -->
+<!-- 		<property name="proxyTargetClass" value="true" />		 -->
+<!-- 	</bean> -->
+	
+<!-- 	<util:properties id="httpClient" location="classpath:httpClient.properties" /> -->
+<!-- 	<aop:aspectj-autoproxy></aop:aspectj-autoproxy> -->
+
+	<bean id="hufsCubridDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="#{jdbc['driverClassName']}" />
+		<property name="url" value="#{jdbc['url']}" />
+		<property name="username" value="#{jdbc['username']}" />
+		<property name="password" value="#{jdbc['password']}" />
+		<property name="initialSize" value="#{jdbc['initialSize']}" />
+		<property name="maxActive" value="#{jdbc['maxActive']}" />
+		<property name="minIdle" value="#{jdbc['minIdle']}" />
+		<property name="maxWait" value="#{jdbc['maxWait']}" />
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"> 
+		<property name="dataSource" ref="hufsCubridDataSource" /> 
+	</bean>
+	
+	<bean id="hufsCubrid" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="hufsCubridSqlMapClient" />
+	</bean>
+	
+	<bean id="hufsCubridSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation" value="classpath:ibatis/sqlMapConfig.xml" />
+		<property name="dataSource" ref="hufsCubridDataSource" />
+	</bean>
+	
+	<util:properties id="jdbc" location="classpath:jdbc.properties" />
+</beans>
