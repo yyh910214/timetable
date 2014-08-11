@@ -33,6 +33,7 @@
 		<url-pattern>*.css</url-pattern>
 		<url-pattern>*.ico</url-pattern>
 		<url-pattern>*.js</url-pattern>
+		<url-pattern>*.png</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
@@ -42,7 +43,7 @@
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
-	
+		
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 		<welcome-file>Index.do</welcome-file>

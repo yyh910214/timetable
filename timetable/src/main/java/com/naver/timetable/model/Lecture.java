@@ -10,9 +10,9 @@ package com.naver.timetable.model;
 /**
  * @author younghan
  */
-public class ClassInfo {
-	private String classNum;
-	private String className;
+public class Lecture {
+	private String lectureNum;
+	private String lectureName;
 	private String room;
 	private String grade;
 	private int point;
@@ -35,17 +35,17 @@ public class ClassInfo {
 	public void setRoom(String room) {
 		this.room = room;
 	}
-	public String getClassNum() {
-		return classNum;
+	public String getLectureNum() {
+		return lectureNum;
 	}
-	public void setClassNum(String classNum) {
-		this.classNum = classNum;
+	public void setLectureNum(String lectureNum) {
+		this.lectureNum = lectureNum;
 	}
-	public String getClassName() {
-		return className;
+	public String getLectureName() {
+		return lectureName;
 	}
-	public void setClassName(String className) {
-		this.className = className;
+	public void setLectureName(String lectureNum) {
+		this.lectureName = lectureNum;
 	}
 
 	public String getGrade() {

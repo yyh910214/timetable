@@ -261,9 +261,13 @@
 			<artifactId>guava</artifactId>
 			<version>12.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+  			<artifactId>jackson-mapper-asl</artifactId>
+  			<version>1.9.3</version>
+  		</dependency>
 	</dependencies>
 	<build>
-		<finalName>timetable</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

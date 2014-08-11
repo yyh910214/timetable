@@ -10,7 +10,8 @@
 	<typeAlias alias="Category" type="com.naver.timetable.model.Category" />
 
 	<sqlMap resource="ibatis/Category.xml" />
-	<sqlMap resource="ibatis/Code.xml" />
 	<sqlMap resource="ibatis/ClassInfo.xml" />
+	<sqlMap resource="ibatis/Lecture.xml" />
+	<sqlMap resource="ibatis/User.xml" />
 </sqlMapConfig>
 

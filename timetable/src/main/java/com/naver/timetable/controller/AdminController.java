@@ -36,7 +36,7 @@ public class AdminController {
 	public ModelAndView tableParsing(Model model)	{
 		tableParsingBO.saveCategory("2014","3");
 		tableParsingBO.saveTimeTable("2014","3");
-		return new ModelAndView("redirect:/index");
+		return new ModelAndView("redirect:/admin/index");
 	}
 
 }

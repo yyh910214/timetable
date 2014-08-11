@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.naver.timetable.model.ClassInfo;
+import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.ClassTime;
 
 /**
@@ -26,7 +26,7 @@ public class ClassInfoDAO {
 	@Qualifier("hufsCubrid")
 	SqlMapClientTemplate hufsCubrid;
 	
-	public void saveClassInfoList(List<ClassInfo> classInfos)	{
+	public void saveClassInfoList(List<Lecture> classInfos)	{
 		hufsCubrid.insert("saveClassInfoList", classInfos);
 	}
 	

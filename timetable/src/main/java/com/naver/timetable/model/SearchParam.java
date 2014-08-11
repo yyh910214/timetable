@@ -11,16 +11,16 @@ package com.naver.timetable.model;
  * @author younghan
  */
 public class SearchParam {
-	private String point;
+	private String[] point;
 	private String[] category;
 	private String[] lectureSche;
 	private String cyber;
 	private String forNative;
 	
-	public String getPoint() {
+	public String[] getPoint() {
 		return point;
 	}
-	public void setPoint(String point) {
+	public void setPoint(String[] point) {
 		this.point = point;
 	}
 	public String[] getCategory() {

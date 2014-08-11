@@ -26,8 +26,8 @@ import com.google.common.collect.Lists;
 import com.naver.timetable.dao.CategoryDAO;
 import com.naver.timetable.dao.ClassInfoDAO;
 import com.naver.timetable.model.Category;
-import com.naver.timetable.model.ClassInfo;
 import com.naver.timetable.model.ClassTime;
+import com.naver.timetable.model.Lecture;
 
 /**
  * 테이블 파싱과 관련된 작업을 하는 BO
@@ -83,7 +83,7 @@ public class TableParsingBO {
 						doc = Jsoup.connect(sb.toString()).get();
 						
 						Elements els = doc.getElementsByAttribute("onmouseover");
-						List<ClassInfo> classList = convertTrElementToClass(els, majorCode, campusCode, categoryId);
+						List<Lecture> classList = convertTrElementToClass(els, majorCode, campusCode, categoryId);
 						List<ClassTime> timeList = makeTimeList(classList);
 	
 						classInfoDAO.saveClassInfoList(classList);
@@ -106,16 +106,16 @@ public class TableParsingBO {
 	 * @param categoryId 카테고리id
 	 * @return 해당 카테고리 페이지에 있는 수업에 대한 정보를 ClassInfo로 만들어서 List로 반환한다.
 	 */
-	public List<ClassInfo> convertTrElementToClass(Elements tr, String majorCode, String campusCode, String categoryId)	{
-		List<ClassInfo> classList = Lists.newArrayList();
+	public List<Lecture> convertTrElementToClass(Elements tr, String majorCode, String campusCode, String categoryId)	{
+		List<Lecture> classList = Lists.newArrayList();
 		for (int i = 0; i < tr.size(); ++i) {
-			ClassInfo classInfo = new ClassInfo();
+			Lecture classInfo = new Lecture();
 			Elements tdElements = tr.get(i).getElementsByTag("td");
 
 			classInfo.setCatgId(categoryId);
 			classInfo.setGrade(tdElements.get(2).text());
-			classInfo.setClassNum(tdElements.get(3).text());
-			classInfo.setClassName(tdElements.get(5).text());
+			classInfo.setLectureNum(tdElements.get(3).text());
+			classInfo.setLectureName(tdElements.get(5).text());
 			//만들어 보기
 			Elements urlElements = tdElements.get(5).getElementsByAttribute("href");
 			classInfo.setUrl(urlElements.size() == 0 ? "" : urlElements.get(0).absUrl("href"));
@@ -135,16 +135,16 @@ public class TableParsingBO {
 	 * @param classInfos 
 	 * @return 강의들에 해당하는 시간을 <학수번호, 강의시간>의 맵형태로 반환한다.
 	 */
-	public List<ClassTime> makeTimeList(List<ClassInfo> classInfos)	{
+	public List<ClassTime> makeTimeList(List<Lecture> classInfos)	{
 		List<ClassTime> classTimeList = Lists.newArrayList();
-		for(ClassInfo classInfo : classInfos)	{
+		for(Lecture classInfo : classInfos)	{
 			String[] result = StringUtils.split(classInfo.getRoom()," ");
 			String weekDay = "";
 			for(String t : result)	{
 				// 숫자로 확인되면 삽입.
 				if(StringUtils.isNumeric(t))	{
 					ClassTime ct = new ClassTime();
-					ct.setClassNum(classInfo.getClassNum());
+					ct.setClassNum(classInfo.getLectureNum());
 					ct.setWeekDay(weekDay + t);
 					classTimeList.add(ct);
 				} else if(t.length() < 4)	{
