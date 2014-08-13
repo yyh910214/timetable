@@ -11,15 +11,15 @@ package com.naver.timetable.model;
  * 학수번호 / 강의 시간 저장용
  * @author younghan
  */
-public class ClassTime {
-	private String classNum;
+public class LectureTime {
+	private String lectureNum;
 	private String weekDay;
-	
-	public String getClassNum() {
-		return classNum;
+
+	public String getLectureNum() {
+		return lectureNum;
 	}
-	public void setClassNum(String classNum) {
-		this.classNum = classNum;
+	public void setLectureNum(String lectureNum) {
+		this.lectureNum = lectureNum;
 	}
 	public String getWeekDay() {
 		return weekDay;

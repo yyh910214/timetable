@@ -7,32 +7,37 @@
 
 package com.naver.timetable.model;
 
+import java.util.List;
+
 /**
  * @author younghan
  */
 public class SearchParam {
-	private String[] point;
-	private String[] category;
-	private String[] lectureSche;
+	private List<String> point;
+	private List<String> category;
+	private List<String> lectureSche;
 	private String cyber;
 	private String forNative;
 	
-	public String[] getPoint() {
-		return point;
-	}
-	public void setPoint(String[] point) {
-		this.point = point;
-	}
-	public String[] getCategory() {
+
+
+	public List<String> getCategory() {
 		return category;
 	}
-	public void setCategory(String[] category) {
+	public void setCategory(List<String> category) {
 		this.category = category;
 	}
-	public String[] getLectureSche() {
+
+	public List<String> getPoint() {
+		return point;
+	}
+	public void setPoint(List<String> point) {
+		this.point = point;
+	}
+	public List<String> getLectureSche() {
 		return lectureSche;
 	}
-	public void setLectureSche(String[] lectureSche) {
+	public void setLectureSche(List<String> lectureSche) {
 		this.lectureSche = lectureSche;
 	}
 	public String getCyber() {

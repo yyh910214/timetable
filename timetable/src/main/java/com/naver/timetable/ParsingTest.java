@@ -7,96 +7,74 @@
 
 package com.naver.timetable;
 
-import java.util.Map;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.jsoup.nodes.Document;
-
-import com.google.common.collect.Maps;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 /**
  * @author younghan
  */
 public class ParsingTest {
 	public static void main(String[] args) {
-		//http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?ledg_year=2014&ledg_sessn=1&campus_sect=H2
-		//http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A
-		//http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=2014&ledg_sessn=1&campus_sect=H2&gubun=1&crs_strct_cd=ARAC2_H2
-		Document doc;
-//		try {
-//			doc = Jsoup.connect("http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=2014&ledg_sessn=1&campus_sect=H2&gubun=1&crs_strct_cd=ARAC2_H2").get();
-//			Elements els = doc.getElementsByAttribute("onmouseover");
-//			for(int i = 0; i < els.size(); ++i)	{
-//				Elements tdElements = els.get(i).getElementsByTag("td");
-//				for(int j = 0; j < tdElements.size(); j++)	{
-//					System.out.println(tdElements.get(j).text());
-//				}
-//			}
-//		} catch (IOException e) {
-//			System.out.println(e);
-//		}
-//		try {
-//			doc = Jsoup.connect("http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?ledg_year=2014&ledg_sessn=1&campus_sect=H1").get();
-//			Elements els = doc.getElementsByAttributeValue("name", "crs_strct_cd");
-//			for(int i = 0; i < els.size(); ++i)	{
-//				Elements optionElements = els.get(i).getElementsByTag("option");
-//				for(int j = 0; j < optionElements.size(); j++)	{
-//					System.out.println(optionElements.get(j).attr("value"));
-//					System.out.println(optionElements.get(j).text());
-//				}
-//			}
-//		} catch (IOException e) {
-//			System.out.println(e);
-//		}
+		HttpClient httpClient = null;
+		HttpResponse httpResponse = null;
+		try	{
+			httpClient = HttpClientBuilder.create().build();
+			httpResponse = httpClient.execute(new HttpGet("http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=2014&ledg_sessn=1&campus_sect=H2&gubun=1&crs_strct_cd=ARAC2_H2"));
 
-//		
-//		CubridDataManager dm = new CubridDataManager();
-//		dm.setStrDriver("cubrid.jdbc.driver.CUBRIDDriver");
-//		dm.setStrDBConn("jdbc:cubrid:10.99.204.57:30102:nstore:::?althosts=10.99.204.57:30102");
-//		dm.setStrUserID("nstore");
-//		dm.setStrUserPW("nstore");
-//		dm.setInitialSize(5);
-//		dm.setMaxActive(30);
-//		dm.setMaxIdle(20);
-//		dm.setMinIdle(5);
-//		dm.setTimeBetweenEvictionRunsMillis(-1);
-//		
-//		dm.initDriver();
-//		
-//		Connection conn = dm.getConnection();
-//		
-//		String strSQL = "SELECT prod_nm FROM nst_prod";
-//	    PreparedStatement objStmt;
-//		try {
-//			objStmt = conn.prepareStatement(strSQL);
-//			ResultSet objRS = objStmt.executeQuery();
-//			List<String> temp = Lists.newArrayList(); 
-//			while (objRS.next()) {
-//				temp.add(objRS.getString(1));
-//			}
-//			
-//			System.out.println(temp);
-//		} catch (SQLException e) {
-//			e.printStackTrace();;
-//		}
-
-		Map<String, String> engDay = Maps.newHashMap();
-		engDay.put("월", "MON");
-		engDay.put("화", "TUE");
-		engDay.put("수", "WED");
-		engDay.put("목", "THU");
-		engDay.put("금", "FRI");
-		engDay.put("토", "SAT");
-	    String test = "목 5 6 7 8 토 3 4 (0309)";
-		String[] result = StringUtils.split(test," ");
-		String weekDay = "";
-		for(String t : result)	{
-			if(StringUtils.isNumeric(t))	{
-				System.out.println(weekDay + t);
-			} else if(t.length() < 4)	{
-				weekDay = engDay.get(t);
-			} 			
+			String html = EntityUtils.toString(httpResponse.getEntity());
+			
+			html = html.replaceAll("<!--(.*?)-->", ""); //중간 공백제거
+			String regexTrHtml = "(<tr[^>]*?>)([\\s\\S]*?)(?=<\\/tr>)";
+			String regexTdHtml = "(<td([^>]*?)>)([\\s\\S]*?)(?=<\\/td>)";
+		
+			Pattern trPattern = Pattern.compile(regexTrHtml);
+			Pattern tdPattern = Pattern.compile(regexTdHtml);
+			Matcher matcher = trPattern.matcher(html);
+			
+			while (matcher.find()) {
+				Matcher tdMatcher = tdPattern.matcher(matcher.group(2));
+				while(tdMatcher.find())	{
+					System.out.println(tdMatcher.group(3));
+				}
+			}
+		}	catch (ClientProtocolException e)	{
+			
+		}	catch (IOException e) { 
+			
+		}	finally	{
+			//예외 먹음
+			HttpClientUtils.closeQuietly(httpResponse);
+			HttpClientUtils.closeQuietly(httpClient);
 		}
+		
+//		String text    =
+//	        "<tr asd>asdfas  df<td></td>\n</tr>\n\n " +
+//	        "<tr qqqq>wsws<td>xcv</td>qq</tr>'.";
+//
+//	String patternString = "(<tr[^>]*?>)([\\s\\S]*?)(?=<\\/tr>)";
+//	System.out.println(patternString);
+//
+//	Pattern pattern = Pattern.compile(patternString);
+//	Matcher matcher = pattern.matcher(text);
+//	int count = 0;
+//	while(matcher.find()) {
+//	    count++;
+//	    System.out.println("found: " + count + " : "
+//	            + matcher.start() + " - " + matcher.end());
+//	}
+//		
+		
+		
+		
 		
 	}
 }

@@ -88,12 +88,12 @@
 	</bean>
 	
 		
-	<mvc:interceptors>
-		<mvc:interceptor>
-			<mvc:mapping path="/**/*"/>
-			<bean class="com.naver.timetable.interceptor.LoginInterceptor"/>
-		</mvc:interceptor>
-	</mvc:interceptors>
+<!-- 	<mvc:interceptors> -->
+<!-- 		<mvc:interceptor> -->
+<!-- 			<mvc:mapping path="/**/*"/> -->
+<!-- 			<bean class="com.naver.timetable.interceptor.LoginInterceptor"/> -->
+<!-- 		</mvc:interceptor> -->
+<!-- 	</mvc:interceptors> -->
 	
 	<util:properties id="jdbc" location="classpath:jdbc.properties" />
 	<util:properties id="error" location="classpath:error.properties" />

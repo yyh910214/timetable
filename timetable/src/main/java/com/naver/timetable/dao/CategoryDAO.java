@@ -38,4 +38,8 @@ public class CategoryDAO {
 	public void insertCategories(List<Category> categories)	{
 		hufsCubrid.insert("insertCategories", categories);
 	}
+	
+	public List<Category> getCatgs()	{
+		return hufsCubrid.queryForList("getCatgs");
+	}
 }
