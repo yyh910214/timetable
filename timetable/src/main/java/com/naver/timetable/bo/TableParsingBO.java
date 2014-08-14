@@ -35,12 +35,16 @@ import com.naver.timetable.model.LectureTime;
 @Service
 public class TableParsingBO {
 	private static final Logger LOG = LoggerFactory.getLogger(TableParsingBO.class);
-	private static final String DEFAULT_URL = "http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=";
-	private static final String CATEGORY_URL = "http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?ledg_year=";
+	private static final String DEFAULT_URL = "http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=%s&ledg_sessn=%s&campus_sect=%s&gubun=%s&%s=%s";
+	private static final String CATEGORY_URL = "http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?org_sect=A&ledg_year=%s&ledg_sessn=%s&campus_sect=%s";
+	private static final String TR_TAG_REGEX = "(<tr[^>]*?>)([\\s\\S]*?)(?=<\\/tr>)";
+	private static final String TD_TAG_REGEX = "(<td([^>]*?)>)([\\s\\S]*?)(?=<\\/td>)";
 	private static final String CHECK_ANCHOR_REGEX = "([\\S\\s]*?)href([\\S\\s]*)";
 	private static final String SPLIT_ANCHOR_REGEX = "\"([\\S]*?)\">([\\S\\s]*)<\\/a>";
+	private static final String SELECT_TAG_REGEX = "<select name=\"%s\"([\\s\\S]*?)<\\/select>";
+	private static final String OPTION_TAG_REGEX = "value[\\s]?=\"(\\S*?)\">([\\S\\s]*?)<\\/option>";
 	
-	private static final Map<String, String> WEEKDAY = new ImmutableMap.Builder<String, String>()
+	public static final Map<String, String> WEEKDAY = new ImmutableMap.Builder<String, String>()
 	.put("월", "MON")
 	.put("화", "TUE")
 	.put("수", "WED")
@@ -58,12 +62,10 @@ public class TableParsingBO {
 	HttpClientBO httpClientBO;
 
 	public void saveTimeTable(String year, String season) {
-		
-//		http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?org_sect=A&ledg_year=2014&ledg_sessn=1
 		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
 			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
 			for(String categoryId : categoryCodes)	{
-				String url = String.format("http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d2.jsp?org_sect=A&ledg_year=%s&ledg_sessn=%s&campus_sect=%s&gubun=%s&%s=%s",
+				String url = String.format(DEFAULT_URL,
 					year, season, campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
 				String htmlBody = httpClientBO.getHttpBody(url);
 				List<Lecture> lectureList = parsingToLecture(htmlBody, categoryId);
@@ -71,7 +73,6 @@ public class TableParsingBO {
 
 				lectureDAO.saveClassInfoList(lectureList);
 				lectureDAO.saveClassTimeList(timeList);
-				
 			}
 		}
 	}
@@ -108,37 +109,39 @@ public class TableParsingBO {
 	 */
 	public void saveCategory(String year, String season) {
 		for (CampusMajorEnum campusMajor : CampusMajorEnum.values()) {
-			String url = String.format("http://webs.hufs.ac.kr:8989/jsp/HUFS/stu1/stu1_c0_a0_d1.jsp?org_sect=A&ledg_year=%s&ledg_sessn=%s&campus_sect=%s", year, season, campusMajor.getCampus());
-			
-			categoryDAO.insertCategories(categories);
+			String url = String.format(CATEGORY_URL, year, season, campusMajor.getCampus());
+			categoryDAO.insertCategories(makeCategoryList(url, campusMajor));
 		}
 	}
 	
 	public List<Category> makeCategoryList(String url, CampusMajorEnum campusMajor)	{
 		String htmlBody = httpClientBO.getHttpBody(url);
-		String selectRegex = "<select name=\"compt_fld_cd\"([\\s\\S]*?)<\\/select>";
-		Matcher selectMatcher = makeMatcher(selectRegex, htmlBody);
+		Matcher selectMatcher = makeMatcher(String.format(SELECT_TAG_REGEX, campusMajor.getMajorUrl()), htmlBody);
+		System.out.println(String.format(SELECT_TAG_REGEX, campusMajor.getMajorUrl()));
 		selectMatcher.find();
-		String categoryRegex = "value =\"(\\S*?)\">([\\S\\s]*?)<\\/option>";
-		Matcher categoryMatcher = makeMatcher(categoryRegex, selectMatcher.group(1));
-		
+		Matcher categoryMatcher = makeMatcher(OPTION_TAG_REGEX, selectMatcher.group(1));
 		List<Category> categories = Lists.newArrayList();
 		while(categoryMatcher.find())	{
 			categories.add(new Category(categoryMatcher.group(1), categoryMatcher.group(2), campusMajor.getMajorCode(), campusMajor.getCampus()));
 		}
 		return categories;
 	}
+	
+	/**
+	 * html내용 중 강의내용을 골라 Lecture의 List로 변경 해줌.
+	 * @param htmlBody html 전체 내용
+	 * @param categoryId 분류 카테고리의 ID
+	 * @return
+	 */
 	public List<Lecture> parsingToLecture(String htmlBody,String categoryId)	{
 		htmlBody = htmlBody.replaceAll("<!--(.*?)-->", ""); //주석 제거
-		String regexTrHtml = "(<tr[^>]*?>)([\\s\\S]*?)(?=<\\/tr>)";
-		String regexTdHtml = "(<td([^>]*?)>)([\\s\\S]*?)(?=<\\/td>)";
 	
-		Matcher trMatcher = makeMatcher(regexTrHtml,htmlBody);
+		Matcher trMatcher = makeMatcher(TR_TAG_REGEX,htmlBody);
 		
 		List<Lecture> lectureList = Lists.newArrayList();
 		trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
 		while (trMatcher.find()) {
-			Matcher tdMatcher = makeMatcher(regexTdHtml, trMatcher.group(2));
+			Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
 			lectureList.add(convertTdToLecture(tdMatcher,categoryId));
 		}
 		return lectureList;
@@ -151,6 +154,7 @@ public class TableParsingBO {
 	 */
 	public Lecture convertTdToLecture(Matcher tdMatcher, String categoryId)	{
 		Lecture lecture = new Lecture();
+		lecture.setCatgId(categoryId);
 		int count = 0;
 		while(tdMatcher.find())	{
 			String text = tdMatcher.group(3).trim();

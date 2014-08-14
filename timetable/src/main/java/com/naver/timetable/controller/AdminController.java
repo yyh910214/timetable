@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.naver.timetable.bo.TableParsingBO;
+import com.naver.timetable.bo.UserBO;
+import com.naver.timetable.model.PageInfo;
+import com.naver.timetable.model.UserSearchParam;
 
 /**
  * 관리자 페이지용 controller
@@ -26,17 +29,26 @@ public class AdminController {
 	@Autowired
 	TableParsingBO tableParsingBO;
 	
+	@Autowired
+	UserBO userBO;
+	
 	@RequestMapping(value = "/index")
 	public ModelAndView	index(Model model)	{
-//		return new ModelAndView("index");
-		return new ModelAndView("searchFilter");
+		return new ModelAndView("adminIndex");
 	}
 	
 	@RequestMapping(value = "/tableParsing")
 	public ModelAndView tableParsing(Model model)	{
-//		tableParsingBO.saveCategory("2014","3");
+		tableParsingBO.saveCategory("2014","3");
 		tableParsingBO.saveTimeTable("2014","3");
 		return new ModelAndView("redirect:/admin/index");
+	}
+	
+	@RequestMapping(value = "/userList")
+	public ModelAndView userList(UserSearchParam searchParam, PageInfo pageInfo)	{
+		ModelAndView mv = new ModelAndView("userList");
+		mv.addObject("userList",userBO.getUsers(searchParam, pageInfo));
+		return mv;
 	}
 
 }

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.naver.timetable.bo.CategoryBO;
 import com.naver.timetable.bo.LectureBO;
+import com.naver.timetable.bo.TableParsingBO;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.SearchParam;
 
@@ -31,27 +33,25 @@ public class LectureController {
 	@Autowired
 	LectureBO lectureBO;
 	
+	@Autowired
+	CategoryBO categoryBO;
+	
 	@RequestMapping(value = "/index")
 	public ModelAndView index(HttpServletRequest request)	{
-		return new ModelAndView("lectureIndex");
+		ModelAndView mv = new ModelAndView("lectureIndex");
+		mv.addObject("categoryGroup", categoryBO.getAllCategoryByGroup());
+		mv.addObject("weekdays", TableParsingBO.WEEKDAY);/////////////
+		return mv;
+	}
+	
+	@RequestMapping(value="test")
+	public ModelAndView test(HttpServletRequest request)	{
+		return new ModelAndView("testTable");
 	}
 	
 	@RequestMapping(value = "/searchLecture", produces=	{"text/html", "application/json"},headers = {"Content-type=application/json"})
 	@ResponseBody
 	public List<Lecture> searchLecture(HttpServletRequest request, @RequestBody SearchParam searchParam)	{
-//		public List<Lecture> searchLecture(HttpServletRequest request, @RequestParam(value = "cyber")String cyber)	{
-//		System.out.println(searchParam.getCategory().length);
 		return lectureBO.searchLecture(searchParam);
-//		System.out.println(category.length);
-//		System.out.println(category[0]);
-//		System.out.println(searchParam.getCyber());
-//		Map<String, String[]> param = request.getParameterMap();
-//		System.out.println(param.get("category"));
-//		Enumeration e = request.getParameterNames();
-//		while(e.hasMoreElements())	{
-//			System.out.println(e.nextElement());
-//		}
-//		System.out.println(searchParam.getCyber());
-
 	}
 }

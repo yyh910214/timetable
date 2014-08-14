@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap>
+	<select id="login" parameterClass="com.naver.timetable.model.LoginInfo" resultClass="com.naver.timetable.model.User">	
+	    	SELECT major as major, stud_num as studNum, email as email,
+	    	user_level as userLevel, sex as sex
+			FROM hufs_user
+	        WHERE email = #email# AND passwd = #passwd#
+	</select>
+	
+	<insert id="join" parameterClass="com.naver.timetable.model.User">
+		INSERT INTO "hufs_user"	(
+    		email,
+    		stud_num,
+    		major,
+    		sex
+    	)
+    	VALUES	(
+    		#email#,
+    		#studNum#,
+    		#major#,
+    		#sex#
+    	)
+	</insert>
+	
+	<update id="setPasswd" parameterClass="com.naver.timetable.model.LoginInfo">
+		UPDATE "hufs_user"
+    	SET passwd = #passwd#
+    	WHERE email = #email#
+	</update>
+	
+	<sql id="searchParam_fragment">
+	  <dynamic prepend="WHERE">
+        	<isNotEmpty prepend="AND" property="major">
+        		major = #major#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="studNum">
+        		stud_num = #studNum#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="email">
+        		email = #email#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="sex">
+        		sex=#sex#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="userLevel">
+        		user_level=#userLevel#
+        	</isNotEmpty>
+        </dynamic>
+	</sql>
+	
+	<select id="countOfUser" parameterClass="com.naver.timetable.model.UserSearchParam" resultClass="Integer">
+		SELECT COUNT(*)
+		FROM hufs_user
+		<include refid="searchParam_fragment"/>
+	</select>
+	
+	<select id="getUsers" parameterClass="com.naver.timetable.model.UserSearchParam" resultClass="com.naver.timetable.model.User">
+		SELECT major as major, stud_num as studNum, email as email, user_level as userLevel, sex as sex
+		FROM hufs_user
+		<include refid="searchParam_fragment"/>
+		ORDER BY user_no
+		<dynamic prepend="FOR">
+			<isNotEmpty prepend="AND" property="startRowNum">
+	        	ORDERBY_NUM() >= #startRowNum#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="AND" property="endRowNum">
+	        	#endRowNum# >= ORDERBY_NUM()  
+	        </isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

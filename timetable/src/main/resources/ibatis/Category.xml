@@ -18,5 +18,14 @@
         WHERE gubun = #majorCode# AND campus_code = #campusCode#
     </select>
     
+    <select id="getAllCategoryByGroup" parameterClass="com.naver.timetable.model.Category" resultClass="com.naver.timetable.model.Category">	
+    	SELECT catg_id as categoryId,
+    	catg_name as categoryName,
+    	campus_code as categoryCampus,
+    	gubun as categoryGubun
+		FROM hufs_catg
+		WHERE campus_code=#categoryCampus# AND gubun=#categoryGubun#
+    </select>
+    
 
 </sqlMap>

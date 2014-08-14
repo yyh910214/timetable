@@ -15,11 +15,9 @@ import java.util.List;
 public class SearchParam {
 	private List<String> point;
 	private List<String> category;
-	private List<String> lectureSche;
+	private List<String> schedule;
 	private String cyber;
 	private String forNative;
-	
-
 
 	public List<String> getCategory() {
 		return category;
@@ -34,11 +32,12 @@ public class SearchParam {
 	public void setPoint(List<String> point) {
 		this.point = point;
 	}
-	public List<String> getLectureSche() {
-		return lectureSche;
+	
+	public List<String> getSchedule() {
+		return schedule;
 	}
-	public void setLectureSche(List<String> lectureSche) {
-		this.lectureSche = lectureSche;
+	public void setSchedule(List<String> schedule) {
+		this.schedule = schedule;
 	}
 	public String getCyber() {
 		return cyber;

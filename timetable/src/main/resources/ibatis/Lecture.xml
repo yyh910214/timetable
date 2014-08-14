@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap>
+  
+    <select id="searchLecture" parameterClass="com.naver.timetable.model.SearchParam" resultClass="com.naver.timetable.model.Lecture">	
+    	SELECT DISTINCT hufs_lecture.lecture_num as lectureNum,
+    		lecture_name as lectureName, room as room,
+    		grade as grade, prof as prof, point as point,
+    		cyber as cyber, native as forNative,
+    		catg_id as catgId, url as url
+		FROM hufs_lecture LEFT OUTER JOIN hufs_lecture_sche ON hufs_lecture.lecture_num = hufs_lecture_sche.lecture_num
+        <dynamic prepend="WHERE">
+        	<isNotEmpty prepend="AND" property="point">
+        		<iterate prepend="point IN" property="point" open="(" close=")" conjunction=",">
+        			#point[]#
+        		</iterate>
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="category">
+        		<iterate prepend="catg_id IN" property="category" open="(" close=")" conjunction=",">
+        			#category[]#
+        		</iterate>
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="schedule">
+        		<iterate prepend="week_day IN" property="schedule" open="(" close=")" conjunction=",">
+        			#schedule[]#
+        		</iterate>
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="cyber">
+        		cyber=#cyber#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="forNative">
+        		native=#forNative#
+        	</isNotEmpty>
+        </dynamic>
+    </select>
+    
+    <delete id="clearLecture">
+		DELETE
+		FROM hufs_lecture
+	</delete>
+	
+	<delete id="clearLectureSche">
+		DELETE
+		FROM hufs_lecture_sche
+	</delete>
+	
+    <insert id="saveLectureList" parameterClass="java.util.List">	
+    	INSERT
+    	INTO hufs_lecture(lecture_num, lecture_name, grade, point, prof, room, cyber, native, url, catg_id)
+    	VALUES
+		<iterate conjunction=",">
+			(#[].lectureNum#, #[].lectureName#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#)
+		</iterate>
+    </insert>
+    
+    
+    <insert id="saveTimeList" parameterClass="java.util.List">	
+    	INSERT
+    	INTO hufs_lecture_sche(lecture_num, week_day)
+    	VALUES
+		<iterate conjunction=",">
+			(#[].lectureNum#, #[].weekDay#)
+		</iterate>
+    </insert>
+    
+
+</sqlMap>
