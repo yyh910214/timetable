@@ -42,4 +42,8 @@ public class CategoryDAO {
 	public List<Category> getAllCategoryByGroup(Category categoryInfo)	{
 		return hufsCubrid.queryForList("getAllCategoryByGroup", categoryInfo);
 	}
+	
+	public void clearCategory()	{
+		hufsCubrid.delete("clearCategory");
+	}
 }

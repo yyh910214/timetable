@@ -17,15 +17,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import com.naver.timetable.dao.CategoryDAO;
+import com.naver.timetable.dao.ConfigDAO;
 import com.naver.timetable.dao.LectureDAO;
 import com.naver.timetable.model.CampusMajorEnum;
 import com.naver.timetable.model.Category;
 import com.naver.timetable.model.Lecture;
+import com.naver.timetable.model.LectureAttending;
 import com.naver.timetable.model.LectureTime;
 
 /**
@@ -44,6 +48,9 @@ public class TableParsingBO {
 	private static final String SELECT_TAG_REGEX = "<select name=\"%s\"([\\s\\S]*?)<\\/select>";
 	private static final String OPTION_TAG_REGEX = "value[\\s]?=\"(\\S*?)\">([\\S\\s]*?)<\\/option>";
 	
+	private static final String YEAR = "year";
+	private static final String SEASON = "season";
+	
 	public static final Map<String, String> WEEKDAY = new ImmutableMap.Builder<String, String>()
 	.put("월", "MON")
 	.put("화", "TUE")
@@ -52,6 +59,7 @@ public class TableParsingBO {
 	.put("금", "FRI")
 	.put("토", "SAT").build();
 	
+	
 	@Autowired
 	CategoryDAO categoryDAO;
 	
@@ -59,16 +67,29 @@ public class TableParsingBO {
 	LectureDAO lectureDAO;
 	
 	@Autowired
+	ConfigDAO configDAO;
+	
+	@Autowired
 	HttpClientBO httpClientBO;
+	
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+	public void doParsing(String year, String season)	{
+		configDAO.insertConfig(YEAR, year);
+		configDAO.insertConfig(SEASON, season);
+		saveCategory(year,season);
+		saveTimeTable(year,season);
+	}
 
 	public void saveTimeTable(String year, String season) {
 		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
 			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
+			
 			for(String categoryId : categoryCodes)	{
 				String url = String.format(DEFAULT_URL,
 					year, season, campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
 				String htmlBody = httpClientBO.getHttpBody(url);
-				List<Lecture> lectureList = parsingToLecture(htmlBody, categoryId);
+				// Lecture에 넣기 위해서 year, season 계속 넘겨줌
+				List<Lecture> lectureList = parsingToLecture(htmlBody, categoryId, year, season);
 				List<LectureTime> timeList = makeTimeList(lectureList);
 
 				lectureDAO.saveClassInfoList(lectureList);
@@ -76,6 +97,7 @@ public class TableParsingBO {
 			}
 		}
 	}
+	
 	
 	/**
 	 * @param lectures 
@@ -90,7 +112,7 @@ public class TableParsingBO {
 				// 숫자로 확인되면 삽입.
 				if(StringUtils.isNumeric(t))	{
 					LectureTime ct = new LectureTime();
-					ct.setLectureNum(lecture.getLectureNum());
+					ct.setLectureID(lecture.getLectureID());
 					ct.setWeekDay(weekDay + t);
 					lectureTimeList.add(ct);
 				} else if(t.length() < 4)	{
@@ -133,16 +155,22 @@ public class TableParsingBO {
 	 * @param categoryId 분류 카테고리의 ID
 	 * @return
 	 */
-	public List<Lecture> parsingToLecture(String htmlBody,String categoryId)	{
+	public List<Lecture> parsingToLecture(String htmlBody,String categoryId, String year, String season)	{
 		htmlBody = htmlBody.replaceAll("<!--(.*?)-->", ""); //주석 제거
 	
 		Matcher trMatcher = makeMatcher(TR_TAG_REGEX,htmlBody);
 		
 		List<Lecture> lectureList = Lists.newArrayList();
 		trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
+		
+		int lectureID = lectureDAO.getLastID() + 1;
+		
 		while (trMatcher.find()) {
 			Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
-			lectureList.add(convertTdToLecture(tdMatcher,categoryId));
+			Lecture lecture = convertTdToLecture(tdMatcher,categoryId, year, season);
+			lecture.setLectureID(lectureID);
+			lectureID++;
+			lectureList.add(lecture);
 		}
 		return lectureList;
 	}
@@ -152,7 +180,7 @@ public class TableParsingBO {
 	 * @param tdMatcher
 	 * @return
 	 */
-	public Lecture convertTdToLecture(Matcher tdMatcher, String categoryId)	{
+	public Lecture convertTdToLecture(Matcher tdMatcher, String categoryId, String year, String season)	{
 		Lecture lecture = new Lecture();
 		lecture.setCatgId(categoryId);
 		int count = 0;
@@ -173,6 +201,9 @@ public class TableParsingBO {
 			}
 			count++;
 		}
+		
+		lecture.setLectureYear(year);
+		lecture.setLectureSeason(season);
 		return lecture;
 	}
 	
@@ -201,5 +232,56 @@ public class TableParsingBO {
 	protected Matcher makeMatcher(String regex, String text)	{
 		Pattern pattern = Pattern.compile(regex);
 		return pattern.matcher(text);
+	}
+	
+	
+	/**
+	 * htmlBody의 내용을 받아서 AttendingList로 생성
+	 * @param htmlBody
+	 * @return
+	 */
+	public List<LectureAttending> convertTdToAttending(String htmlBody)	{
+		htmlBody = htmlBody.replaceAll("<!--(.*?)-->", ""); //주석 제거	
+		Matcher trMatcher = makeMatcher(TR_TAG_REGEX,htmlBody);
+		
+		List<LectureAttending> attendingList = Lists.newArrayList();
+		trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
+		while (trMatcher.find()) {
+			Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
+
+			LectureAttending attending = new LectureAttending();
+			//3번째가 학수번호
+			for(int i = 0; i <= 3; i++)	{
+				tdMatcher.find();
+			}
+			
+			attending.setLectureNum(tdMatcher.group(3).trim());
+			// 10번째가 수강 인원
+			for(int i = 0; i <= 6; i++)	{
+				tdMatcher.find();
+			}
+			String tdText = tdMatcher.group(3).trim();
+			attending.setAttending(Integer.parseInt(tdText.split("/")[0]));
+
+			attendingList.add(attending);
+			
+		}
+		return attendingList;
+	}
+	
+	/**
+	 * 수강인원 저장
+	 */
+	public void saveAttending()	{
+		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
+			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
+			for(String categoryId : categoryCodes)	{
+				String url = String.format(DEFAULT_URL,
+					configDAO.getValue(YEAR), configDAO.getValue(SEASON), campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
+				String htmlBody = httpClientBO.getHttpBody(url);
+				
+				lectureDAO.saveAttending(convertTdToAttending(htmlBody));
+			}
+		}
 	}
 }

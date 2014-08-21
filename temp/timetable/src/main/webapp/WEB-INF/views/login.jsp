@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
     pageEncoding="EUC-KR"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -6,54 +7,56 @@
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
 <title>Insert title here</title>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-<style>body{background:url(/img/bg.png) center;margin: 0 auto;width: 960px;padding-top: 50px}.footer{margin-top:50px;text-align:center;color:#666;font:bold 14px Arial}.footer a{color:#999;text-decoration:none}.login-form{margin: 50px auto;}</style>
-<link rel="stylesheet" href="/css/login.css" />
-<script type="text/javascript">
-$(document).ready(function() {
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-	// Check if JavaScript is enabled
-	$('body').addClass('js');
+<!-- Optional theme -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
-	// Make the checkbox checked on load
-	$('.login-form span').addClass('checked').children('input').attr('checked', true);
-
-	// Click function
-	$('.login-form span').on('click', function() {
-
-		if ($(this).children('input').attr('checked')) {
-			$(this).children('input').attr('checked', false);
-			$(this).removeClass('checked');
-		}
-
-		else {
-			$(this).children('input').attr('checked', true);
-			$(this).addClass('checked');
-		}
-	
-	});
-
-});
-</script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div >
 
 	<h1>Login</h1>
+	<c:if test="${null ne retryMessage}">
+		${retryMessage}
+	</c:if>
+	<form class="form-horizontal" role="form" action="/login/login" method="post">
+  <div class="form-group">
+    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="email">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputPassword" class="col-sm-2 control-label">Password</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="passwd">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <div class="checkbox">
+        <label>
+          <input type="checkbox"> Remember me(아직)
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">로그인</button>
+    </div>
+  </div>
+  <div class="form-group">
+  	<div class="col-sm-offset-2 col-sm-10">
+  		<a href="/login/join">회원가입</a>
+  	</div>
+  </div>
+</form>
 
-	<form class="login-form" action="/login/login" method="post">
-
-		<input type="text" name="email" placeholder="email">
-		
-		<input type="password" name="passwd" placeholder="password">
-		
-		<span>
-			<input type="checkbox" name="checkbox">
-			<label for="checkbox">회원가입</label>
-		</span>
-		
-		<input type="submit" value="log in">
-
-	</form>
 
 </div>
 

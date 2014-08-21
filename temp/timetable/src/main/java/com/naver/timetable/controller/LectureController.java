@@ -22,7 +22,7 @@ import com.naver.timetable.bo.CategoryBO;
 import com.naver.timetable.bo.LectureBO;
 import com.naver.timetable.bo.TableParsingBO;
 import com.naver.timetable.model.Lecture;
-import com.naver.timetable.model.SearchParam;
+import com.naver.timetable.model.LectureSearchParam;
 
 /**
  * @author younghan
@@ -46,12 +46,20 @@ public class LectureController {
 	
 	@RequestMapping(value="test")
 	public ModelAndView test(HttpServletRequest request)	{
-		return new ModelAndView("testTable");
+		return new ModelAndView("maindecorators");
 	}
 	
 	@RequestMapping(value = "/searchLecture", produces=	{"text/html", "application/json"},headers = {"Content-type=application/json"})
 	@ResponseBody
-	public List<Lecture> searchLecture(HttpServletRequest request, @RequestBody SearchParam searchParam)	{
+	public List<Lecture> searchLecture(HttpServletRequest request, @RequestBody LectureSearchParam searchParam)	{
+		//연도와 학기도 페이지에서 같이 넘겨받아야 함
+		searchParam.setYear("2014");
+		searchParam.setSeason("3");
 		return lectureBO.searchLecture(searchParam);
+	}
+	
+	@RequestMapping(value = "/attendingView")
+	public ModelAndView attendingView(String lectureNum)	{
+		return new ModelAndView("attendingView").addObject("attendingList", lectureBO.getAttendingList(lectureNum));
 	}
 }

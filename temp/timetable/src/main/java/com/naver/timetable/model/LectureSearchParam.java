@@ -12,7 +12,9 @@ import java.util.List;
 /**
  * @author younghan
  */
-public class SearchParam {
+public class LectureSearchParam {
+	private String year;
+	private String season;
 	private List<String> point;
 	private List<String> category;
 	private List<String> schedule;
@@ -33,6 +35,18 @@ public class SearchParam {
 		this.point = point;
 	}
 	
+	public String getYear() {
+		return year;
+	}
+	public void setYear(String year) {
+		this.year = year;
+	}
+	public String getSeason() {
+		return season;
+	}
+	public void setSeason(String season) {
+		this.season = season;
+	}
 	public List<String> getSchedule() {
 		return schedule;
 	}

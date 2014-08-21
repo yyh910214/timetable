@@ -35,8 +35,8 @@ public class UserDAO {
 		hufsCubrid.insert("join", user);
 	}
 	
-	public void setPasswd(LoginInfo loginInfo)	{
-		hufsCubrid.update("setPasswd", loginInfo);
+	public void changePasswd(LoginInfo changeInfo)	{
+		hufsCubrid.update("changePasswd", changeInfo);
 	}
 	
 	public int countOfUser(UserSearchParam searchParam)	{
@@ -45,5 +45,13 @@ public class UserDAO {
 	
 	public List<User> getUsers(UserSearchParam searchParam)	{
 		return hufsCubrid.queryForList("getUsers", searchParam);
+	}
+	
+	public User getUser(String email)	{
+		return (User)hufsCubrid.queryForObject("getUser", email);
+	}
+	
+	public void editUser(User user)	{
+		hufsCubrid.update("editUser", user);
 	}
 }

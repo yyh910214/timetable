@@ -4,66 +4,92 @@
 
 <sqlMap>
   
-    <select id="searchLecture" parameterClass="com.naver.timetable.model.SearchParam" resultClass="com.naver.timetable.model.Lecture">	
-    	SELECT DISTINCT hufs_lecture.lecture_num as lectureNum,
+  	<select id="getLecture" parameterClass="String" resultClass="Lecture">
+  		SELECT hufs_lecture.lecture_id as lectureID, lecture_num as lectureNum,
     		lecture_name as lectureName, room as room,
     		grade as grade, prof as prof, point as point,
     		cyber as cyber, native as forNative,
-    		catg_id as catgId, url as url
-		FROM hufs_lecture LEFT OUTER JOIN hufs_lecture_sche ON hufs_lecture.lecture_num = hufs_lecture_sche.lecture_num
-        <dynamic prepend="WHERE">
-        	<isNotEmpty prepend="AND" property="point">
-        		<iterate prepend="point IN" property="point" open="(" close=")" conjunction=",">
-        			#point[]#
-        		</iterate>
-        	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="category">
-        		<iterate prepend="catg_id IN" property="category" open="(" close=")" conjunction=",">
-        			#category[]#
-        		</iterate>
-        	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="schedule">
-        		<iterate prepend="week_day IN" property="schedule" open="(" close=")" conjunction=",">
-        			#schedule[]#
-        		</iterate>
-        	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="cyber">
-        		cyber=#cyber#
-        	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="forNative">
-        		native=#forNative#
-        	</isNotEmpty>
-        </dynamic>
+    		catg_id as catgId, url as url, lecture_year as lectureYear, lecture_season as lectureSeason
+    	FROM hufs_lecture
+    	WHERE lecture_id=#lectureID#
+  	</select>
+    <select id="searchLecture" parameterClass="com.naver.timetable.model.LectureSearchParam" resultClass="Lecture">	
+    	SELECT DISTINCT hufs_lecture.lecture_id as lectureID, lecture_num as lectureNum,
+    		lecture_name as lectureName, room as room,
+    		grade as grade, prof as prof, point as point,
+    		cyber as cyber, native as forNative,
+    		catg_id as catgId, url as url, lecture_year as lectureYear, lecture_season as lectureSeason 
+		FROM hufs_lecture LEFT OUTER JOIN hufs_lecture_sche ON hufs_lecture.lecture_id = hufs_lecture_sche.lecture_id
+		WHERE lecture_year=#year# AND lecture_season=#season#
+
+       	<isNotEmpty prepend="AND" property="point">
+       		<iterate prepend="point IN" property="point" open="(" close=")" conjunction=",">
+       			#point[]#
+       		</iterate>
+       	</isNotEmpty>
+       	<isNotEmpty prepend="AND" property="category">
+       		<iterate prepend="catg_id IN" property="category" open="(" close=")" conjunction=",">
+       			#category[]#
+       		</iterate>
+       	</isNotEmpty>
+       	<isNotEmpty prepend="AND" property="schedule">
+       		<iterate prepend="week_day IN" property="schedule" open="(" close=")" conjunction=",">
+       			#schedule[]#
+       		</iterate>
+       	</isNotEmpty>
+       	<isNotEmpty prepend="AND" property="cyber">
+       		cyber=#cyber#
+       	</isNotEmpty>
+       	<isNotEmpty prepend="AND" property="forNative">
+       		native=#forNative#
+       	</isNotEmpty>
+       
     </select>
-    
-    <delete id="clearLecture">
-		DELETE
-		FROM hufs_lecture
-	</delete>
-	
-	<delete id="clearLectureSche">
-		DELETE
-		FROM hufs_lecture_sche
-	</delete>
 	
     <insert id="saveLectureList" parameterClass="java.util.List">	
     	INSERT
-    	INTO hufs_lecture(lecture_num, lecture_name, grade, point, prof, room, cyber, native, url, catg_id)
+    	INTO hufs_lecture
     	VALUES
 		<iterate conjunction=",">
-			(#[].lectureNum#, #[].lectureName#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#)
+			(#[].lectureID#, #[].lectureNum#, #[].lectureName#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#, #[].lectureYear#, #[].lectureSeason#)
 		</iterate>
     </insert>
     
     
-    <insert id="saveTimeList" parameterClass="java.util.List">	
+    <insert id="saveTimeList" parameterClass="List">	
     	INSERT
-    	INTO hufs_lecture_sche(lecture_num, week_day)
+    	INTO hufs_lecture_sche(lecture_id, week_day)
     	VALUES
 		<iterate conjunction=",">
-			(#[].lectureNum#, #[].weekDay#)
+			(#[].lectureID#, #[].weekDay#)
 		</iterate>
     </insert>
     
+    <insert id="saveAttending" parameterClass="List">
+    	INSERT
+    	INTO hufs_attending
+    	VALUES
+    	<iterate conjunction=",">
+			(#[].lectureNum#, #[].attending#, DATE(NOW()))
+		</iterate>
+    </insert>
+    
+    <select id="getLectureAttending" parameterClass="String" resultClass="LectureAttending">
+    	SELECT lecture_num as lectureNum, attending as attending, insert_date as insertDate
+    	FROM hufs_attending
+    	WHERE lecture_num=#lectureNum#
+    </select>
+    
+    
+    <select id="getLectureTime" parameterClass="String" resultClass="LectureTime">
+    	SELECT week_day
+    	FROM hufs_lecture_sche
+    	WHERE lecture_id = #lectureID#
+    </select>
+    
+    <select id="getLastID" resultClass="Integer">
+    	SELECT MAX(lecture_id)
+    	FROM hufs_lecture
+    </select>
 
 </sqlMap>

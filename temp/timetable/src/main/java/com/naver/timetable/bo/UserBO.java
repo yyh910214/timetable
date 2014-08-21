@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.naver.timetable.dao.UserDAO;
-import com.naver.timetable.model.PageInfo;
+import com.naver.timetable.model.LoginInfo;
 import com.naver.timetable.model.User;
 import com.naver.timetable.model.UserSearchParam;
 
@@ -25,12 +25,22 @@ public class UserBO {
 	@Autowired
 	UserDAO userDAO;
 	
-	public List<User> getUsers(UserSearchParam searchParam, PageInfo pageInfo)	{
-		pageInfo.setTotalRow(userDAO.countOfUser(searchParam));
-		pageInfo.init();
-		searchParam.setStartRowNum(pageInfo.getStartRowNum());
-		searchParam.setEndRowNum(pageInfo.getEndRowNum());
+	public List<User> getUsers(UserSearchParam searchParam)	{
+		searchParam.setTotalRow(userDAO.countOfUser(searchParam));
+		searchParam.init();
 		
 		return userDAO.getUsers(searchParam);
+	}
+	
+	public User getUser(String email)	{
+		return userDAO.getUser(email);
+	}
+	
+	public void editUser(User user)	{
+		userDAO.editUser(user);
+	}
+	
+	public void changePasswd(LoginInfo changeInfo)	{
+		userDAO.changePasswd(changeInfo);
 	}
 }

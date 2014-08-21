@@ -12,7 +12,7 @@ package com.naver.timetable.model;
  */
 public class User {
 	private String major;
-	private String studNum;
+	private String studentNum;
 	private String email;
 	private String sex;
 	private int userLevel;
@@ -29,11 +29,12 @@ public class User {
 	public void setMajor(String major) {
 		this.major = major;
 	}
-	public String getStudNum() {
-		return studNum;
+
+	public String getStudentNum() {
+		return studentNum;
 	}
-	public void setStudNum(String studNum) {
-		this.studNum = studNum;
+	public void setStudentNum(String studentNum) {
+		this.studentNum = studentNum;
 	}
 	public String getEmail() {
 		return email;

@@ -8,6 +8,7 @@
 package com.naver.timetable.model;
 
 /**
+ * 캠퍼스와 전공으로 구분지어 검색하기 위해서.
  * @author younghan
  */
 public enum CampusMajorEnum {

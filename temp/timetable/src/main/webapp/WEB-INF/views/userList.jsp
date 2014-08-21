@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>Insert title here</title>
+<title>회원 관리</title>
 <link rel="stylesheet" href="/css/jAutoCheckList/bootstrap/bootstrap.min.css" />
 <link rel="stylesheet" href="/css/jAutoCheckList/bootstrap/bootstrap-responsive.min.css" />
 <link rel="stylesheet" href="/css/jAutoCheckList/jAutochecklist.min.css" />
@@ -25,13 +25,44 @@
 				<th>email</th>
 				<th>성별</th>
 				<th>등급</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody id="user">
+			<form action="/admin/userList" method="get">
+				<tr>
+					<td>
+						<input type="text" name="studentNum" />
+					</td>
+					<td>
+						<input type="text" name="major" />
+					</td>
+					<td>
+						<input type="email" name="email" />
+					</td>
+					<td>
+						<select name="sex">
+							<option value="">전체</option>
+							<option value="MALE">남자</option>
+							<option value="FEMALE">여자</option>
+						</select>
+					</td>
+					<td>
+						<select name="userLevel">
+							<option value="0">전체</option>
+							<option value="1">관리</option>
+							<option value="2">일반</option>
+						</select>
+					</td>
+					<td>
+						<input type="submit" value="검색"/>
+					</td>
+				</tr>
+			</form>
 			<c:forEach var="user" varStatus="idx" items="${userList}">
 					<tr>
 					<td>
-						${user.studNum }
+						${user.studentNum }
 					</td>
 					<td>
 						${user.major }
@@ -44,6 +75,9 @@
 					</td>
 					<td>
 						${user.userLevel }
+					</td>
+					<td>
+						<a href="/user/editUser?email=${user.email}">수정</a>
 					</td>
 					</tr>
 			</c:forEach>

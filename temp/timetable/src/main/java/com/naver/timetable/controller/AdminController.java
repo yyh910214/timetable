@@ -15,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.naver.timetable.bo.TableParsingBO;
 import com.naver.timetable.bo.UserBO;
-import com.naver.timetable.model.PageInfo;
 import com.naver.timetable.model.UserSearchParam;
 
 /**
@@ -38,17 +37,29 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/tableParsing")
-	public ModelAndView tableParsing(Model model)	{
-		tableParsingBO.saveCategory("2014","3");
-		tableParsingBO.saveTimeTable("2014","3");
+	public ModelAndView tableParsing(String year, String season)	{
+		System.out.println(year + " and " + season);
+		tableParsingBO.doParsing(year, season);
 		return new ModelAndView("redirect:/admin/index");
 	}
 	
 	@RequestMapping(value = "/userList")
-	public ModelAndView userList(UserSearchParam searchParam, PageInfo pageInfo)	{
+	public ModelAndView userList(UserSearchParam searchParam)	{
 		ModelAndView mv = new ModelAndView("userList");
-		mv.addObject("userList",userBO.getUsers(searchParam, pageInfo));
+		mv.addObject("userList",userBO.getUsers(searchParam));
+		mv.addObject("searchParam",searchParam);
 		return mv;
+	}
+	
+	@RequestMapping(value = "/updateAttending")
+	public ModelAndView updateAttending(Model model)	{
+		tableParsingBO.saveAttending();
+		return new ModelAndView("redirect:/admin/index");
+	}
+	
+	@RequestMapping(value = "/test")
+	public ModelAndView test(Model model)	{
+		return new ModelAndView("testGraph");
 	}
 
 }

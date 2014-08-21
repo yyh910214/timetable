@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.naver.timetable.dao.UserDAO;
 import com.naver.timetable.model.LoginInfo;
@@ -36,23 +37,30 @@ public class LoginBO {
 		}
 	}
 	
+	public void logout(HttpServletRequest request)	{
+		HttpSession session = request.getSession();
+		if(session.getAttribute("user") != null)	{
+			session.removeAttribute("user");
+		}
+	}
+	
 	/**
 	 * 회원 가입을 처리하는 메소드
-	 * 트랜젝션 처리가 필요함
 	 * pw를 유저에 담지 않기 위해서
 	 * @param request
 	 * @param user
 	 * @param pw
 	 */
+	@Transactional
 	public void join(HttpServletRequest request, User user, String passwd)	{
 		userDAO.join(user);
-		setPasswd(user.getEmail(),passwd);
+		changePasswd(user.getEmail(),passwd);
 	}
 	
-	public void setPasswd(String email, String passwd)	{
+	public void changePasswd(String email, String passwd)	{
 		LoginInfo loginInfo = new LoginInfo();
 		loginInfo.setEmail(email);
 		loginInfo.setPasswd(passwd);
-		userDAO.setPasswd(loginInfo);
+		userDAO.changePasswd(loginInfo);
 	}
 }

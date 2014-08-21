@@ -11,6 +11,7 @@ package com.naver.timetable.model;
  * @author younghan
  */
 public class Lecture {
+	private int lectureID;
 	private String lectureNum;
 	private String lectureName;
 	private String room;
@@ -21,8 +22,30 @@ public class Lecture {
 	private String forNative;
 	private String catgId;
 	private String url;
+	private String lectureYear;
+	private String lectureSeason;
 
 	
+
+	public int getLectureID() {
+		return lectureID;
+	}
+	public void setLectureID(int lectureID) {
+		this.lectureID = lectureID;
+	}
+
+	public String getLectureYear() {
+		return lectureYear;
+	}
+	public void setLectureYear(String lectureYear) {
+		this.lectureYear = lectureYear;
+	}
+	public String getLectureSeason() {
+		return lectureSeason;
+	}
+	public void setLectureSeason(String lectureSeason) {
+		this.lectureSeason = lectureSeason;
+	}
 	public String getCatgId() {
 		return catgId;
 	}

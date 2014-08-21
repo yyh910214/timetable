@@ -3,14 +3,14 @@
     "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap>
-	<select id="login" parameterClass="com.naver.timetable.model.LoginInfo" resultClass="com.naver.timetable.model.User">	
-	    	SELECT major as major, stud_num as studNum, email as email,
+	<select id="login" parameterClass="LoginInfo" resultClass="User">	
+	    	SELECT major as major, stud_num as studentNum, email as email,
 	    	user_level as userLevel, sex as sex
 			FROM hufs_user
 	        WHERE email = #email# AND passwd = #passwd#
 	</select>
 	
-	<insert id="join" parameterClass="com.naver.timetable.model.User">
+	<insert id="join" parameterClass="User">
 		INSERT INTO "hufs_user"	(
     		email,
     		stud_num,
@@ -19,13 +19,21 @@
     	)
     	VALUES	(
     		#email#,
-    		#studNum#,
+    		#studentNum#,
     		#major#,
     		#sex#
     	)
 	</insert>
 	
-	<update id="setPasswd" parameterClass="com.naver.timetable.model.LoginInfo">
+	<update id="editUser" parameterClass="User">
+		UPDATE "hufs_user"
+		SET stud_num = #studentNum#,
+			major = #major#,
+			sex = #sex#
+    	WHERE email = #email#
+	</update>
+	
+	<update id="changePasswd" parameterClass="LoginInfo">
 		UPDATE "hufs_user"
     	SET passwd = #passwd#
     	WHERE email = #email#
@@ -36,8 +44,8 @@
         	<isNotEmpty prepend="AND" property="major">
         		major = #major#
         	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="studNum">
-        		stud_num = #studNum#
+        	<isNotEmpty prepend="AND" property="studentNum">
+        		stud_num = #studentNum#
         	</isNotEmpty>
         	<isNotEmpty prepend="AND" property="email">
         		email = #email#
@@ -45,20 +53,27 @@
         	<isNotEmpty prepend="AND" property="sex">
         		sex=#sex#
         	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="userLevel">
-        		user_level=#userLevel#
-        	</isNotEmpty>
+       		<isNotEqual prepend="AND" property="userLevel" compareValue="0">
+       			user_level=#userLevel#
+       		</isNotEqual>
         </dynamic>
 	</sql>
 	
-	<select id="countOfUser" parameterClass="com.naver.timetable.model.UserSearchParam" resultClass="Integer">
+	<select id="countOfUser" parameterClass="UserSearchParam" resultClass="Integer">
 		SELECT COUNT(*)
 		FROM hufs_user
 		<include refid="searchParam_fragment"/>
 	</select>
 	
-	<select id="getUsers" parameterClass="com.naver.timetable.model.UserSearchParam" resultClass="com.naver.timetable.model.User">
-		SELECT major as major, stud_num as studNum, email as email, user_level as userLevel, sex as sex
+	<select id="getUser" parameterClass="java.lang.String" resultClass="User">	
+	    	SELECT major as major, stud_num as studentNum, email as email,
+	    	user_level as userLevel, sex as sex
+			FROM hufs_user
+	        WHERE email = #email#
+	</select>
+	
+	<select id="getUsers" parameterClass="UserSearchParam" resultClass="User">
+		SELECT major as major, stud_num as studentNum, email as email, user_level as userLevel, sex as sex
 		FROM hufs_user
 		<include refid="searchParam_fragment"/>
 		ORDER BY user_no

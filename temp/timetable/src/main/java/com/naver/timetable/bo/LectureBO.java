@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.naver.timetable.dao.LectureDAO;
 import com.naver.timetable.model.Lecture;
-import com.naver.timetable.model.SearchParam;
+import com.naver.timetable.model.LectureAttending;
+import com.naver.timetable.model.LectureSearchParam;
 
 /**
  * @author younghan
@@ -23,7 +24,17 @@ import com.naver.timetable.model.SearchParam;
 public class LectureBO {
 	@Autowired
 	LectureDAO lectureDAO;
-	public List<Lecture> searchLecture(SearchParam searchParam)	{
+	
+	public List<Lecture> searchLecture(LectureSearchParam searchParam)	{
 		return lectureDAO.searchLecture(searchParam);
 	}
+	
+	public List<LectureAttending> getAttendingList(String lectureNum)	{
+		return lectureDAO.getAttendingList(lectureNum);
+	}
+	
+	public Lecture getLecture(String lectureID)	{
+		return lectureDAO.getLecture(lectureID);
+	}
+	
 }

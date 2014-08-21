@@ -12,14 +12,14 @@ package com.naver.timetable.model;
  * @author younghan
  */
 public class LectureTime {
-	private String lectureNum;
+	private int lectureID;
 	private String weekDay;
 
-	public String getLectureNum() {
-		return lectureNum;
+	public int getLectureID() {
+		return lectureID;
 	}
-	public void setLectureNum(String lectureNum) {
-		this.lectureNum = lectureNum;
+	public void setLectureID(int lectureID) {
+		this.lectureID = lectureID;
 	}
 	public String getWeekDay() {
 		return weekDay;

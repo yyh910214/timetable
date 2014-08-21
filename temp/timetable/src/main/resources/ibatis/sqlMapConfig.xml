@@ -8,9 +8,20 @@
 		maxTransactions="5" useStatementNamespaces="true" />
 		
 	<typeAlias alias="Category" type="com.naver.timetable.model.Category" />
+	<typeAlias alias="User" type="com.naver.timetable.model.User" />
+	<typeAlias alias="Comment" type="com.naver.timetable.model.Comment" />
+	<typeAlias alias="Lecture" type="com.naver.timetable.model.Lecture" />
+	<typeAlias alias="CommentSearchParam" type="com.naver.timetable.model.CommentSearchParam" />
+	<typeAlias alias="LoginInfo" type="com.naver.timetable.model.LoginInfo" />
+	<typeAlias alias="UserSearchParam" type="com.naver.timetable.model.UserSearchParam" />
+	<typeAlias alias="LectureAttending" type="com.naver.timetable.model.LectureAttending" />
+	<typeAlias alias="LectureTime" type="com.naver.timetable.model.LectureTime" />
 
 	<sqlMap resource="ibatis/Category.xml" />
 	<sqlMap resource="ibatis/Lecture.xml" />
 	<sqlMap resource="ibatis/User.xml" />
+	<sqlMap resource="ibatis/Comment.xml" />
+	<sqlMap resource="ibatis/Config.xml" />
+	<sqlMap resource="ibatis/TimeTable.xml" />
 </sqlMapConfig>
 

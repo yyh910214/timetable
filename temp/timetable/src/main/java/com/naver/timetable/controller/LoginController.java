@@ -49,19 +49,20 @@ public class LoginController {
 	 */
 	@RequestMapping(value="login", method=RequestMethod.POST)
 	public ModelAndView login(LoginInfo loginInfo, HttpServletRequest request)	{
+		HttpSession session = request.getSession();
 		if (loginBO.login(loginInfo, request))	{
-			return new ModelAndView("lectureIndex");
+			String targetPage = session.getAttribute("targetPage") == null ? "/lecture/index" : (String)session.getAttribute("targetPage"); 
+			return new ModelAndView("redirect:"+ targetPage);
 		} else {
+			System.out.println("qwe");
+			System.out.println(retryMessage);
 			return  new ModelAndView("login").addObject("retryMessage", retryMessage);
 		}
 	}
 	
 	@RequestMapping(value="logout")
 	public ModelAndView logout(HttpServletRequest request)	{
-		HttpSession session = request.getSession();
-		if(session.getAttribute("user") != null)	{
-			session.removeAttribute("user");
-		}
+		loginBO.logout(request);
 		return new ModelAndView("login").addObject("logoutMessage", logoutMessage);
 	}
 	
@@ -73,7 +74,7 @@ public class LoginController {
 	@RequestMapping(value="join", method=RequestMethod.POST)
 	public ModelAndView join(HttpServletRequest request, User user, String passwd)	{
 		loginBO.join(request, user, passwd);
-		return new ModelAndView("lectureIndex");
+		return new ModelAndView("redirect:/lecture/index");
 	}
 	
 	@RequestMapping(value="searchPasswd", method=RequestMethod.GET)

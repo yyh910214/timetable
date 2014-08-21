@@ -5,7 +5,7 @@
 <sqlMap>
     <insert id="insertCategories" parameterClass="java.util.List">	
     	INSERT
-    	INTO hufs_catg(catg_id, catg_name, campus_code, gubun)
+    	INTO hufs_category(catg_id, catg_name, campus_code, gubun)
     	VALUES
 		<iterate conjunction=",">
 			(#[].categoryId#, #[].categoryName#, #[].categoryCampus#, #[].categoryGubun#)
@@ -14,18 +14,22 @@
     
     <select id="getCatgCode" parameterClass="java.util.Map" resultClass="java.lang.String">	
     	SELECT catg_id
-		FROM hufs_catg
+		FROM hufs_category
         WHERE gubun = #majorCode# AND campus_code = #campusCode#
     </select>
     
-    <select id="getAllCategoryByGroup" parameterClass="com.naver.timetable.model.Category" resultClass="com.naver.timetable.model.Category">	
+    <select id="getAllCategoryByGroup" parameterClass="Category" resultClass="Category">	
     	SELECT catg_id as categoryId,
     	catg_name as categoryName,
     	campus_code as categoryCampus,
     	gubun as categoryGubun
-		FROM hufs_catg
+		FROM hufs_category
 		WHERE campus_code=#categoryCampus# AND gubun=#categoryGubun#
     </select>
     
+    <delete id="clearCategory">
+		DELETE
+		FROM hufs_category
+	</delete>
 
 </sqlMap>

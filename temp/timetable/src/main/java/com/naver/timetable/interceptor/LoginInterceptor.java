@@ -25,7 +25,14 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 			// Login페이지는 예외
 			if(request.getRequestURI().equals("/login/login")) return true;
 			if(request.getRequestURI().equals("/login/join")) return true;
+			session.setAttribute("targetPage", request.getRequestURI());
 			response.sendRedirect("/login/login");
+			return false;
+		}
+		//로그인이 되어 있는 경우에는 login 이나 join페이지 접근 못하게 함.
+		if(request.getRequestURI().equals("/login/login") ||
+			request.getRequestURI().equals("/login/join"))	{
+			response.sendRedirect("/lecture/index");
 			return false;
 		}
 		return true;

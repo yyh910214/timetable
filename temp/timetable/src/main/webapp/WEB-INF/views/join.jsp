@@ -1,51 +1,53 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
-<title>Insert title here</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>회원 가입</title>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-<style>body{background:url(/img/bg.png) center;margin: 0 auto;width: 960px;padding-top: 50px}.footer{margin-top:50px;text-align:center;color:#666;font:bold 14px Arial}.footer a{color:#999;text-decoration:none}.login-form{margin: 50px auto;}</style>
-<link rel="stylesheet" href="/css/join.css" />
-<script type="text/javascript">
-$(document).ready(function() {
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 
-	// Check if JavaScript is enabled
-	$('body').addClass('js');
+<!-- Optional theme -->
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 
-});
-</script>
+<!-- Latest compiled and minified JavaScript -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div >
+		<h1>회원가입</h1>
 
-	<h1>Login</h1>
+		<form class="form-horizontal" method="post" action="/login/join">
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="email">Email : </label> <input class="col-sm-10" type="email"
+					class="form-control" name="email" id="email"
+					placeholder="email을 입력하세요" required>
 
-	<form class="login-form" action="/login/join" method="post">
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="passwd">비밀번호 :</label> <input type="password"
+					name="passwd" id="passwd" placeholder="비밀번호" required> <label
+					for="passwd_confirm">비밀번호 확인 :</label> <input type="password"
+					name="passwd_confirm" id="passwd_confirm" placeholder="비민벌호확인" required>
 
-		<input type="text" name="email" placeholder="email">
-		
-		<input type="password" name="passwd" placeholder="��й�ȣ">
-		<input type="password" name="passwd_confirm" placeholder="��ι�ȣȮ��">
-		
-		<input type="text" name="major" placeholder="����">
-		<input type="text" name="studNum" placeholder="�й�">
-		
-		<div>
-			<label>���� :</label>
-			<p>
-				<label><input type="radio" name="sex" value="FEMALE" checked />FEMALE</label><br/>
-				<label><input type="radio" name="sex" value="MALE"/>MALE</label><br/>
-			</p>
-		</div>	
-		
+			</div>
 
-		<input type="submit" value="ȸ������">
+			<div class="form-group">
+			<label class="col-sm-2 control-label" for="major" >전공 :</label>
+				<input class="col-sm-10" type="text" id="major" name="major" placeholder="전공" required>
+			<label for="studNum">학번 :</label>	
+				<input type="text" id="studNum" name="studNum" placeholder="학번" required>
+			</div>
 
-	</form>
-
-</div>
+			<div>
+				<label class="col-sm-2 control-label">성별 :</label>
+					<label><input type="radio" name="sex" value="FEMALE"
+						checked />여자</label><label><input type="radio"
+						name="sex" value="MALE" />남자</label>
+			</div>
+			<button type="submit" class="btn btn-default">가입</button>
+		</form>
 
 
 </body>

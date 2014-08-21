@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<select id="getComment" parameterClass="Comment" resultClass="Comment">	
+    	SELECT hufs_comment.lecture_id as lectureID, student_num as studentNum, comment as text, hufs_comment.point as point
+		FROM hufs_comment, hufs_lecture 
+        WHERE hufs_comment.lecture_id=hufs_lecture.lecture_id
+        AND hufs_comment.lecture_id = #lectureID# AND student_num = #studentNum#
+    </select>
+    
+    <select id="countOfComment" parameterClass="CommentSearchParam" resultClass="Integer">
+		SELECT COUNT(*)
+		FROM hufs_comment
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="lectureID">
+        		lecture_id=#lectureID#
+        	</isNotEmpty>
+        	
+        	<isNotEmpty prepend="AND" property="studentNum">
+        		student_num=#studentNum#
+        	</isNotEmpty>
+        </dynamic>
+	</select>
+    
+    <select id="getComments" parameterClass="CommentSearchParam" resultClass="Comment">	
+    	SELECT lecture_id as lectureID, student_num as studentNum, comment as text, point as point
+		FROM hufs_comment
+		
+		<dynamic prepend="WHERE">
+			<isNotEmpty prepend="AND" property="lectureID">
+        		lecture_id=#lectureID#
+        	</isNotEmpty>
+        	<isNotEmpty prepend="AND" property="studentNum">
+        		student_num=#studentNum#
+        	</isNotEmpty>
+        </dynamic>    
+        
+        ORDER BY point
+		<dynamic prepend="FOR">
+			<isNotEmpty prepend="AND" property="startRowNum">
+	        	ORDERBY_NUM() >= #startRowNum#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="AND" property="endRowNum">
+	        	#endRowNum# >= ORDERBY_NUM()  
+	        </isNotEmpty>
+		</dynamic>
+    </select>
+    
+    <select id="getCommentWithLecture" parameterClass="CommentSearchParam" resultClass="com.naver.timetable.model.CommentWithLecture">	
+    	SELECT hufs_comment.lecture_id as lectureID, lecture_name as lectureName, prof as prof, student_num as studentNum, comment as text, hufs_comment.point as point
+		FROM hufs_comment, hufs_lecture
+		WHERE hufs_comment.lecture_id = hufs_lecture.lecture_id
+	
+		<isNotEmpty prepend="AND" property="lectureID">
+       		lecture_id=#lectureID#
+       	</isNotEmpty>
+       	<isNotEmpty prepend="AND" property="studentNum">
+       		student_num=#studentNum#
+       	</isNotEmpty>
+       	    
+        ORDER BY hufs_comment.point
+		<dynamic prepend="FOR">
+			<isNotEmpty prepend="AND" property="startRowNum">
+	        	ORDERBY_NUM() >= #startRowNum#
+	        </isNotEmpty>
+	        <isNotEmpty prepend="AND" property="endRowNum">
+	        	#endRowNum# >= ORDERBY_NUM()  
+	        </isNotEmpty>
+		</dynamic>
+    </select>
+    
+    <insert id="insertComment" parameterClass="Comment">
+    	INSERT INTO "hufs_comment"	(
+    		lecture_id,
+    		student_num,
+    		comment,
+    		point
+    	)
+    	VALUES	(
+    		#lectureID#,
+    		#studentNum#,
+    		#text#,
+    		#point#
+    	)
+    </insert>
+    
+    <update id="updateComment" parameterClass="Comment">
+    	UPDATE "hufs_comment"
+    	SET comment = #text#,
+    		point = #point#
+    	WHERE lecture_id = #lectureID# AND student_num = #studentNum#
+    </update>
+    
+    <delete id="deleteComment" parameterClass="Comment">
+    	DELETE
+    	FROM "hufs_comment"
+    	WHERE lecture_id = #lectureID# AND student_num = #studentNum#
+    </delete>
+    
+</sqlMap>

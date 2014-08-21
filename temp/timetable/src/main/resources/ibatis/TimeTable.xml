@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap>
+  	
+  	<select id="getTimeTable" parameterClass="Map" resultClass="Lecture">
+  		SELECT DISTINCT hufs_lecture.lecture_num as lectureNum,
+    		lecture_name as lectureName, room as room,
+    		grade as grade, prof as prof, point as point,
+    		cyber as cyber, native as forNative,
+    		catg_id as catgId, url as url
+    	FROM hufs_timetable T, hufs_lecture L
+    	WHERE T.lecture_id = L.lecture_id AND studend_num = #studentNum#
+    		AND lecture_year = #lecture_year# AND lecture_season = #lecture_season#
+  	</select>
+  	
+  	<select id="checkTimeTable" parameterClass="Map" resultClass="Integer">
+  		SELECT COUNT(*)
+  		FROM hufs_timetable T, hufs_lecture L, hufs_lecture_sche S
+  		WHERE T.lecture_id = L.lecture_id AND T.lecture_id = S.lecture_id
+  			AND T.student_num = #studentNum# AND L.lecture_season = #lecture_season#
+  			AND L.lecture_year = #lecture_year#
+  			<dynamic prepend="AND">
+	  			<iterate prepend="L.weekday IN" property="lectureTimes" open="(" close=")" conjunction=",">
+	        			#lectureTimes[]#
+	        	</iterate>
+	        </dynamic>
+  	</select>
+  	
+  	<insert id="addLecture" parameterClass="Map">	
+    	INSERT
+    	INTO hufs_timetable
+    	VALUES (#studentNum#,#lectureID#)
+    </insert>
+    
+    <select id="isExistLecture" parameterClass="Map" resultClass="Integer">
+    	SELECT COUNT(*)
+    	FROM hufs_timetable
+    	WHERE student_num=#studentNum# AND lecture_id=#lectureID#
+    </select>
+  	
+</sqlMap>

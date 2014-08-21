@@ -12,8 +12,7 @@ package com.naver.timetable.model;
  */
 public class Comment {
 	private String studentNum;
-	private String lectureNum;
-	private String prof;
+	private String lectureID;
 	private String text;
 	private int point;
 	
@@ -23,17 +22,12 @@ public class Comment {
 	public void setStudentNum(String studentNum) {
 		this.studentNum = studentNum;
 	}
-	public String getLectureNum() {
-		return lectureNum;
+	
+	public String getLectureID() {
+		return lectureID;
 	}
-	public void setLectureNum(String lectureNum) {
-		this.lectureNum = lectureNum;
-	}
-	public String getProf() {
-		return prof;
-	}
-	public void setProf(String prof) {
-		this.prof = prof;
+	public void setLectureID(String lectureID) {
+		this.lectureID = lectureID;
 	}
 	public String getText() {
 		return text;
