@@ -30,11 +30,7 @@ public class CommentDAO {
 	public Comment getComment(Comment comment)	{
 		return (Comment)hufsCubrid.queryForObject("getComment",comment);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Comment> getComments(CommentSearchParam searchParam)	{
-		return hufsCubrid.queryForList("getComments", searchParam);
-	}
+
 	
 	public void insertComment(Comment comment)	{
 		hufsCubrid.insert("insertComment", comment);

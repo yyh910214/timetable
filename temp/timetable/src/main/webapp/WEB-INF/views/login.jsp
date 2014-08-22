@@ -36,15 +36,15 @@
       <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="passwd">
     </div>
   </div>
-  <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <div class="checkbox">
-        <label>
-          <input type="checkbox"> Remember me(아직)
-        </label>
-      </div>
-    </div>
-  </div>
+<!--   <div class="form-group"> -->
+<!--     <div class="col-sm-offset-2 col-sm-10"> -->
+<!--       <div class="checkbox"> -->
+<!--         <label> -->
+<!--           <input type="checkbox"> Remember me(아직) -->
+<!--         </label> -->
+<!--       </div> -->
+<!--     </div> -->
+<!--   </div> -->
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-10">
       <button type="submit" class="btn btn-default">로그인</button>

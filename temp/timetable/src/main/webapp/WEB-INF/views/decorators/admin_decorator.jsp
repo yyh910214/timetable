@@ -32,7 +32,7 @@
       <decorator:body />
 
       <div class="footer">
-        <p>&copy; HUFS 2014</p>
+        <p>&copy; YYH 2014</p>
       </div>
 
     </div> <!-- /container -->

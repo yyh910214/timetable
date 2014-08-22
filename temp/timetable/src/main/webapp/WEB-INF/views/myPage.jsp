@@ -24,6 +24,37 @@
 <div class="row">
 <div class="col-md-12"><div class="row">
 <div class="col-md-1"><a href="/user/editUser?email=${sessionScope.user.email}">개인정보수정</a></div>
+<div class="col-md-11">
+	<h1>내 시간표</h1>
+	<table class="bordered">
+		<thead>
+			<tr>
+				<th>학수번호</th>
+				<th>과목명</th>
+				<th>학년</th>
+				<th>교수님</th>
+				<th>학점</th>
+				<th>강의시간</th>
+				<th>사이버</th>
+				<th>원어</th>
+			</tr>
+		</thead>
+		<tbody id="lecture">
+			<c:forEach var="lecture" varStatus="idx" items="${timetable}">
+				<tr>
+					<td>${lecture.lectureNum }</td>
+					<td>${lecture.lectureName }</td>
+					<td>${lecture.grade }</td>
+					<td>${lecture.prof }</td>
+					<td>${lecture.point }</td>
+					<td>${lecture.room }</td>
+					<td>${lecture.cyber }</td>
+					<td>${lecture.forNative }</td>
+				</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</div>
 	<div class="col-md-11">
 	<h1>내 평가</h1>
 	<table class="bordered">
@@ -41,7 +72,7 @@
 		<tbody id="comment">
 			<c:if test="${fn:length(comments) eq 0}">
 				<tr>
-					<td colspan="6">등록한 강의평가가 없습니다.</td>
+					<td colspan="7">등록한 강의평가가 없습니다.</td>
 				</tr>
 			</c:if>
 			<c:forEach var="comment" varStatus="idx" items="${comments}">

@@ -21,6 +21,7 @@ import com.naver.timetable.bo.CommentBO;
 import com.naver.timetable.bo.LectureBO;
 import com.naver.timetable.model.Comment;
 import com.naver.timetable.model.CommentSearchParam;
+import com.naver.timetable.model.CommentWithLecture;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.User;
 
@@ -39,10 +40,8 @@ public class CommentController {
 	@RequestMapping(value = "commentList")
 	public ModelAndView commentList(CommentSearchParam searchParam)	{
 		ModelAndView mv = new ModelAndView("commentList");
-		List<Comment> comments = commentBO.getComments(searchParam);
-		Lecture commentLecture = lectureBO.getLecture(searchParam.getLectureID());
+		List<CommentWithLecture> comments = commentBO.getCommentWithLecture(searchParam);
 		mv.addObject("comments", comments);
-		mv.addObject("commentLecture", commentLecture);
 		mv.addObject("searchParam",searchParam);
 		return mv;
 	}
@@ -74,8 +73,9 @@ public class CommentController {
 	}
 	
 	@RequestMapping(value = "delete")
-	public ModelAndView deleteComment(Comment comment)	{
+	public ModelAndView deleteComment(HttpServletRequest request, Comment comment)	{
 		commentBO.deleteComment(comment);
-		return new ModelAndView("redirect:/comment/commentList?lectureID=" + comment.getLectureID());
+		
+		return new ModelAndView("redirect:" + request.getHeader("Referer"));
 	}
 }

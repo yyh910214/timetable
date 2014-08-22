@@ -27,6 +27,15 @@
 		WHERE campus_code=#categoryCampus# AND gubun=#categoryGubun#
     </select>
     
+    
+    <select id="getAllCategory" resultClass="Category">	
+    	SELECT catg_id as categoryId,
+    	catg_name as categoryName,
+    	campus_code as categoryCampus,
+    	gubun as categoryGubun
+		FROM hufs_category
+    </select>
+    
     <delete id="clearCategory">
 		DELETE
 		FROM hufs_category

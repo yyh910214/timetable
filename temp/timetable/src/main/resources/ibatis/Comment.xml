@@ -23,51 +23,20 @@
         </dynamic>
 	</select>
     
-    <select id="getComments" parameterClass="CommentSearchParam" resultClass="Comment">	
-    	SELECT lecture_id as lectureID, student_num as studentNum, comment as text, point as point
-		FROM hufs_comment
-		
-		<dynamic prepend="WHERE">
-			<isNotEmpty prepend="AND" property="lectureID">
-        		lecture_id=#lectureID#
-        	</isNotEmpty>
-        	<isNotEmpty prepend="AND" property="studentNum">
-        		student_num=#studentNum#
-        	</isNotEmpty>
-        </dynamic>    
-        
-        ORDER BY point
-		<dynamic prepend="FOR">
-			<isNotEmpty prepend="AND" property="startRowNum">
-	        	ORDERBY_NUM() >= #startRowNum#
-	        </isNotEmpty>
-	        <isNotEmpty prepend="AND" property="endRowNum">
-	        	#endRowNum# >= ORDERBY_NUM()  
-	        </isNotEmpty>
-		</dynamic>
-    </select>
-    
     <select id="getCommentWithLecture" parameterClass="CommentSearchParam" resultClass="com.naver.timetable.model.CommentWithLecture">	
-    	SELECT hufs_comment.lecture_id as lectureID, lecture_name as lectureName, prof as prof, student_num as studentNum, comment as text, hufs_comment.point as point
+    	SELECT hufs_comment.lecture_id as lectureID, lecture_num as lectureNum, lecture_name as lectureName, prof as prof, student_num as studentNum, comment as text, hufs_comment.point as point
 		FROM hufs_comment, hufs_lecture
 		WHERE hufs_comment.lecture_id = hufs_lecture.lecture_id
 	
 		<isNotEmpty prepend="AND" property="lectureID">
-       		lecture_id=#lectureID#
+       		hufs_comment.lecture_id=#lectureID#
        	</isNotEmpty>
        	<isNotEmpty prepend="AND" property="studentNum">
        		student_num=#studentNum#
        	</isNotEmpty>
        	    
         ORDER BY hufs_comment.point
-		<dynamic prepend="FOR">
-			<isNotEmpty prepend="AND" property="startRowNum">
-	        	ORDERBY_NUM() >= #startRowNum#
-	        </isNotEmpty>
-	        <isNotEmpty prepend="AND" property="endRowNum">
-	        	#endRowNum# >= ORDERBY_NUM()  
-	        </isNotEmpty>
-		</dynamic>
+		FOR ORDERBY_NUM() >= #startRowNum# AND #endRowNum# >= ORDERBY_NUM()  
     </select>
     
     <insert id="insertComment" parameterClass="Comment">

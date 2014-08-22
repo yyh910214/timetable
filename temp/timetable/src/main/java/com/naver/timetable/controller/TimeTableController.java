@@ -44,8 +44,10 @@ public class TimeTableController {
 		HttpSession session = request.getSession();
 		User user = (User)session.getAttribute("user");
 		
-		timetableBO.addTimeTable(user.getStudentNum(), lectureID, year, season);
-		return new ModelAndView("redirect:/lecture/index");
+		if(timetableBO.addTimeTable(user.getStudentNum(), lectureID, year, season))
+			return new ModelAndView("redirect:/lecture/index");
+		else
+			return new ModelAndView("redirect:/lecture/index");
 	}
 	
 }

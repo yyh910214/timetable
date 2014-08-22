@@ -29,7 +29,8 @@
 		UPDATE "hufs_user"
 		SET stud_num = #studentNum#,
 			major = #major#,
-			sex = #sex#
+			sex = #sex#,
+			user_level = #userLevel#
     	WHERE email = #email#
 	</update>
 	

@@ -12,9 +12,9 @@ import java.util.List;
 /**
  * @author younghan
  */
-public class LectureSearchParam {
-	private String year;
-	private String season;
+public class LectureSearchParam extends PageInfo{
+	private String lectureYear;
+	private String lectureSeason;
 	private List<String> point;
 	private List<String> category;
 	private List<String> schedule;
@@ -35,17 +35,18 @@ public class LectureSearchParam {
 		this.point = point;
 	}
 	
-	public String getYear() {
-		return year;
+
+	public String getLectureYear() {
+		return lectureYear;
 	}
-	public void setYear(String year) {
-		this.year = year;
+	public void setLectureYear(String lectureYear) {
+		this.lectureYear = lectureYear;
 	}
-	public String getSeason() {
-		return season;
+	public String getLectureSeason() {
+		return lectureSeason;
 	}
-	public void setSeason(String season) {
-		this.season = season;
+	public void setLectureSeason(String lectureSeason) {
+		this.lectureSeason = lectureSeason;
 	}
 	public List<String> getSchedule() {
 		return schedule;

@@ -34,16 +34,9 @@ public class CommentBO {
 	 */
 	public Comment getComment(User user, String lectureID)	{
 		Comment comment = new Comment();
-		//같은 과목인데 학수번호가 나뉘는 경우가 있어서 뒤의 2자리는 제거하고 관리.
 		comment.setLectureID(lectureID);
 		comment.setStudentNum(user.getStudentNum());
 		return commentDAO.getComment(comment);
-	}
-	//////////////////////////////////////////////////////////////////////////////변경
-	public List<Comment> getComments(CommentSearchParam searchParam)	{
-		searchParam.setTotalRow(commentDAO.countOfComment(searchParam));
-		searchParam.init();
-		return commentDAO.getComments(searchParam);
 	}
 	
 	public void insertComment(Comment comment)	{
@@ -59,6 +52,8 @@ public class CommentBO {
 	}
 	
 	public List<CommentWithLecture> getCommentWithLecture(CommentSearchParam searchParam)	{
+		searchParam.setTotalRow(commentDAO.countOfComment(searchParam));
+		searchParam.init();
 		return commentDAO.getCommentWithLecture(searchParam);
 	}
 }

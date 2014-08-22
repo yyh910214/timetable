@@ -35,8 +35,8 @@
 		<tbody id="comment">
 			<c:forEach var="comment" varStatus="idx" items="${comments}">
 				<tr>
-					<td>${commentLecture.lectureName }</td>
-					<td>${commentLecture.prof }</td>
+					<td>${comment.lectureName }</td>
+					<td>${comment.prof }</td>
 					<td>${comment.studentNum }</td>
 					<td>${comment.text }</td>
 					<td>${comment.point }</td>
@@ -45,11 +45,19 @@
 			</c:forEach>
 		</tbody>
 	</table>
+	<c:if test="${searchParam.lectureID ne null }">
 	<c:forEach begin="1" end="${searchParam.totalPage}" step="1" var="page">
 		<a
 			href="/comment/commentList?lectureID=${searchParam.lectureID }&currentPage=${page}">[${page}]</a>
 	</c:forEach>
 	<button
-		onclick="location.href='/comment/commentForm?lectureID=${searchParam.lectureID}'">등록</button>
+		onclick="location.href='/comment/commentForm?lectureID=${searchParam.lectureID}'">등록</button></c:if>
+	<c:if test="${searchParam.lectureID eq null }">
+	<c:forEach begin="1" end="${searchParam.totalPage}" step="1" var="page">
+		<a
+			href="/comment/commentList?studentNum=${searchParam.studentNum }&currentPage=${page}">[${page}]</a>
+	</c:forEach>
+	</c:if>
+	
 </body>
 </html>

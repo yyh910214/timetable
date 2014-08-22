@@ -14,13 +14,13 @@
     	WHERE lecture_id=#lectureID#
   	</select>
     <select id="searchLecture" parameterClass="com.naver.timetable.model.LectureSearchParam" resultClass="Lecture">	
-    	SELECT DISTINCT hufs_lecture.lecture_id as lectureID, lecture_num as lectureNum,
+    	SELECT hufs_lecture.lecture_id as lectureID, lecture_num as lectureNum,
     		lecture_name as lectureName, room as room,
     		grade as grade, prof as prof, point as point,
     		cyber as cyber, native as forNative,
     		catg_id as catgId, url as url, lecture_year as lectureYear, lecture_season as lectureSeason 
 		FROM hufs_lecture LEFT OUTER JOIN hufs_lecture_sche ON hufs_lecture.lecture_id = hufs_lecture_sche.lecture_id
-		WHERE lecture_year=#year# AND lecture_season=#season#
+		WHERE lecture_year=#lectureYear# AND lecture_season=#lectureSeason#
 
        	<isNotEmpty prepend="AND" property="point">
        		<iterate prepend="point IN" property="point" open="(" close=")" conjunction=",">
@@ -81,7 +81,7 @@
     </select>
     
     
-    <select id="getLectureTime" parameterClass="String" resultClass="LectureTime">
+    <select id="getLectureTime" parameterClass="String" resultClass="String">
     	SELECT week_day
     	FROM hufs_lecture_sche
     	WHERE lecture_id = #lectureID#

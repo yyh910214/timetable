@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import com.naver.timetable.dao.CategoryDAO;
 import com.naver.timetable.dao.ConfigDAO;
@@ -72,14 +73,16 @@ public class TableParsingBO {
 	@Autowired
 	HttpClientBO httpClientBO;
 	
-	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void doParsing(String year, String season)	{
-		configDAO.insertConfig(YEAR, year);
-		configDAO.insertConfig(SEASON, season);
+//		configDAO.insertConfig(YEAR, year);
+//		configDAO.insertConfig(SEASON, season);
 		saveCategory(year,season);
 		saveTimeTable(year,season);
 	}
 
+	
+	//threadwafaf
 	public void saveTimeTable(String year, String season) {
 		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
 			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
@@ -89,11 +92,14 @@ public class TableParsingBO {
 					year, season, campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
 				String htmlBody = httpClientBO.getHttpBody(url);
 				// Lecture에 넣기 위해서 year, season 계속 넘겨줌
+				//검사할 필요 없는 Category 도 검사함
 				List<Lecture> lectureList = parsingToLecture(htmlBody, categoryId, year, season);
 				List<LectureTime> timeList = makeTimeList(lectureList);
-
-				lectureDAO.saveClassInfoList(lectureList);
-				lectureDAO.saveClassTimeList(timeList);
+				
+				if(!lectureList.isEmpty())	{
+					lectureDAO.saveClassInfoList(lectureList);
+					lectureDAO.saveClassTimeList(timeList);
+				}
 			}
 		}
 	}
@@ -130,10 +136,37 @@ public class TableParsingBO {
 	 * 연도와 학기를 입력으로 받음.
 	 */
 	public void saveCategory(String year, String season) {
+		//기존에 존재하는 키일경우 넘기는 방법이 필요함.
+		List<Category> existCategory = categoryDAO.getAllCategory();
 		for (CampusMajorEnum campusMajor : CampusMajorEnum.values()) {
 			String url = String.format(CATEGORY_URL, year, season, campusMajor.getCampus());
-			categoryDAO.insertCategories(makeCategoryList(url, campusMajor));
+			
+			List<Category> categoryToInsert = deleteExistCategory(existCategory, makeCategoryList(url, campusMajor));
+			if(categoryToInsert.size() > 0)
+				categoryDAO.insertCategories(categoryToInsert);
 		}
+	}
+	
+	/**
+	 * 기존에 중복되는 categoryId가 있는지 확인하고 중복되지 않는 category만 넘겨줌
+	 * @param existCategory
+	 * @param newCategory
+	 * @return
+	 */
+	public List<Category> deleteExistCategory(List<Category> existCategory, List<Category> newCategory)	{
+		Map<String, Category> compareMap = Maps.newHashMap();
+		for(Category category : existCategory)	{
+			compareMap.put(category.getCategoryId(), category);
+		}
+		
+		List<Category> result = Lists.newArrayList();
+		for(Category category : newCategory)	{
+			if(!compareMap.containsKey(category.getCategoryId()))	{
+				result.add(category);
+			}
+		}
+		
+		return result;
 	}
 	
 	public List<Category> makeCategoryList(String url, CampusMajorEnum campusMajor)	{

@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.naver.timetable.bo.CommentBO;
+import com.naver.timetable.bo.TimeTableBO;
 import com.naver.timetable.bo.UserBO;
 import com.naver.timetable.model.CommentSearchParam;
 import com.naver.timetable.model.CommentWithLecture;
+import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.LoginInfo;
 import com.naver.timetable.model.User;
 @Controller
@@ -31,6 +33,9 @@ public class UserController {
 	
 	@Autowired
 	CommentBO commentBO;
+	
+	@Autowired
+	TimeTableBO timeTableBO;
 	
 	@RequestMapping(value = "/editUser")
 	public ModelAndView editUser(HttpServletRequest request, String email)	{
@@ -45,6 +50,8 @@ public class UserController {
 	
 	@RequestMapping(value = "/edit")
 	public ModelAndView edit(HttpServletRequest request, User user, String passwd)	{
+		System.out.println(user.getUserLevel());
+		System.out.println(user.getEmail());
 		userBO.editUser(user);
 		LoginInfo loginInfo = new LoginInfo();
 		loginInfo.setEmail(user.getEmail());
@@ -68,8 +75,10 @@ public class UserController {
 		
 		searchParam.setStudentNum(user.getStudentNum());
 		List<CommentWithLecture> comments = commentBO.getCommentWithLecture(searchParam);
+		List<Lecture> timetable = timeTableBO.getTimeTable(user.getStudentNum(), "2014", "3");
 		mv.addObject("comments", comments);
 		mv.addObject("searchParam", searchParam);
+		mv.addObject("timetable", timetable);
 		return mv;
 	}
 	

@@ -5,27 +5,27 @@
 <sqlMap>
   	
   	<select id="getTimeTable" parameterClass="Map" resultClass="Lecture">
-  		SELECT DISTINCT hufs_lecture.lecture_num as lectureNum,
+  		SELECT DISTINCT L.lecture_num as lectureNum,
     		lecture_name as lectureName, room as room,
     		grade as grade, prof as prof, point as point,
     		cyber as cyber, native as forNative,
     		catg_id as catgId, url as url
     	FROM hufs_timetable T, hufs_lecture L
-    	WHERE T.lecture_id = L.lecture_id AND studend_num = #studentNum#
+    	WHERE T.lecture_id = L.lecture_id AND student_num = #studentNum#
     		AND lecture_year = #lecture_year# AND lecture_season = #lecture_season#
   	</select>
   	
   	<select id="checkTimeTable" parameterClass="Map" resultClass="Integer">
   		SELECT COUNT(*)
-  		FROM hufs_timetable T, hufs_lecture L, hufs_lecture_sche S
-  		WHERE T.lecture_id = L.lecture_id AND T.lecture_id = S.lecture_id
-  			AND T.student_num = #studentNum# AND L.lecture_season = #lecture_season#
+  		FROM hufs_timetable T LEFT OUTER JOIN hufs_lecture L ON(T.lecture_id = L.lecture_id)
+  		LEFT OUTER JOIN hufs_lecture_sche S ON(T.lecture_id=S.lecture_id)
+  		WHERE T.student_num = #studentNum# AND L.lecture_season = #lecture_season#
   			AND L.lecture_year = #lecture_year#
-  			<dynamic prepend="AND">
-	  			<iterate prepend="L.weekday IN" property="lectureTimes" open="(" close=")" conjunction=",">
+  			<isNotNull prepend="AND" property="lectureTimes">
+	  			<iterate prepend="S.week_day IN" property="lectureTimes" open="(" close=")" conjunction=",">
 	        			#lectureTimes[]#
 	        	</iterate>
-	        </dynamic>
+	        </isNotNull>
   	</select>
   	
   	<insert id="addLecture" parameterClass="Map">	
