@@ -36,6 +36,11 @@
 		FROM hufs_category
     </select>
     
+    <select id="getCategoryCount" resultClass="Integer">
+    	SELECT COUNT(*)
+    	FROM hufs_category
+    </select>
+    
     <delete id="clearCategory">
 		DELETE
 		FROM hufs_category

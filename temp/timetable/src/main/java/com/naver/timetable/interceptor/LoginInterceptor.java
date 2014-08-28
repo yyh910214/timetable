@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import com.naver.timetable.model.User;
+
 /**
  * @author younghan
  */
@@ -21,6 +23,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		HttpSession session = request.getSession();
 		//user검사 후 로그인이 안된 상태면
+		User user = (User)session.getAttribute("user");
 		if( session.getAttribute("user") == null)	{
 			// Login페이지는 예외
 			if(request.getRequestURI().equals("/login/login")) return true;
@@ -35,6 +38,13 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 			response.sendRedirect("/lecture/index");
 			return false;
 		}
+//		Method method = (Method)handler;
+//		for(Object param : method.getParameterTypes())	{
+//			System.out.println(param.getClass().getName());
+//			if(param instanceof User)	{
+//				System.out.println("qwe");
+//			}
+//		}
 		return true;
 	} 
 }

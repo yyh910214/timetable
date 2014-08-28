@@ -25,6 +25,7 @@ import com.naver.timetable.model.CommentWithLecture;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.LoginInfo;
 import com.naver.timetable.model.User;
+import com.naver.timetable.resolver.SessionUser;
 @Controller
 @RequestMapping(value ="/user")
 public class UserController {
@@ -50,15 +51,12 @@ public class UserController {
 	
 	@RequestMapping(value = "/edit")
 	public ModelAndView edit(HttpServletRequest request, User user, String passwd)	{
-		System.out.println(user.getUserLevel());
-		System.out.println(user.getEmail());
 		userBO.editUser(user);
 		LoginInfo loginInfo = new LoginInfo();
 		loginInfo.setEmail(user.getEmail());
 		loginInfo.setPasswd(passwd);
 		if(!passwd.equals(""))	{
 			userBO.changePasswd(loginInfo);
-			System.out.println("eeee");
 		}
 		
 		HttpSession session = request.getSession();
@@ -67,12 +65,8 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/myPage")
-	public ModelAndView myPage(HttpServletRequest request, CommentSearchParam searchParam)	{
+	public ModelAndView myPage(@SessionUser User user, CommentSearchParam searchParam)	{
 		ModelAndView mv = new ModelAndView("myPage");
-		
-		HttpSession session = request.getSession();
-		User user = (User)session.getAttribute("user");
-		
 		searchParam.setStudentNum(user.getStudentNum());
 		List<CommentWithLecture> comments = commentBO.getCommentWithLecture(searchParam);
 		List<Lecture> timetable = timeTableBO.getTimeTable(user.getStudentNum(), "2014", "3");

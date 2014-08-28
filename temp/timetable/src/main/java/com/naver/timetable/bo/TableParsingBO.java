@@ -9,6 +9,7 @@ package com.naver.timetable.bo;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,6 +32,7 @@ import com.naver.timetable.model.CampusMajorEnum;
 import com.naver.timetable.model.Category;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.LectureAttending;
+import com.naver.timetable.model.LectureSearchParam;
 import com.naver.timetable.model.LectureTime;
 
 /**
@@ -52,6 +54,8 @@ public class TableParsingBO {
 	private static final String YEAR = "year";
 	private static final String SEASON = "season";
 	
+	private static final int THREAD_COUNT = 10;
+	
 	public static final Map<String, String> WEEKDAY = new ImmutableMap.Builder<String, String>()
 	.put("월", "MON")
 	.put("화", "TUE")
@@ -59,7 +63,6 @@ public class TableParsingBO {
 	.put("목", "THU")
 	.put("금", "FRI")
 	.put("토", "SAT").build();
-	
 	
 	@Autowired
 	CategoryDAO categoryDAO;
@@ -75,32 +78,91 @@ public class TableParsingBO {
 	
 	@Transactional(isolation = Isolation.READ_COMMITTED)
 	public void doParsing(String year, String season)	{
-//		configDAO.insertConfig(YEAR, year);
-//		configDAO.insertConfig(SEASON, season);
-		saveCategory(year,season);
-		saveTimeTable(year,season);
+		// 한 학기에 한번만 가능하도록 함.
+		if(configDAO.isExistSeason(year, season) == 0)	{
+			configDAO.insertSeason(year, season);
+			saveCategory(year,season);
+			saveTimeTable(year,season);
+		}
 	}
-
 	
-	//threadwafaf
-	public void saveTimeTable(String year, String season) {
+	/**
+	 * 년도와 학기를 인자로 받아서 해당하는 url조합들을 만들어 Queue형식으로 돌려줌.
+	 * @param year
+	 * @param season
+	 * @return
+	 */
+	protected Queue<UrlEntity> makeUrlQueue(String year, String season)	{
+		Queue<UrlEntity> urlQueue = Lists.newLinkedList();
+		
 		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
 			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
-			
-			for(String categoryId : categoryCodes)	{
-				String url = String.format(DEFAULT_URL,
-					year, season, campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
-				String htmlBody = httpClientBO.getHttpBody(url);
-				// Lecture에 넣기 위해서 year, season 계속 넘겨줌
-				//검사할 필요 없는 Category 도 검사함
-				List<Lecture> lectureList = parsingToLecture(htmlBody, categoryId, year, season);
-				List<LectureTime> timeList = makeTimeList(lectureList);
-				
-				if(!lectureList.isEmpty())	{
-					lectureDAO.saveClassInfoList(lectureList);
-					lectureDAO.saveClassTimeList(timeList);
-				}
+			for(String categoryCode : categoryCodes)	{
+				UrlEntity urlEntity = new UrlEntity(year, season, categoryCode, campusMajor);
+				urlQueue.add(urlEntity);
+				//처음에는 wait 후 notify방식으로 사용
+//				urlQueue.notify();
 			}
+		}
+		return urlQueue;
+	}
+
+	public void saveTimeTable(String year, String season) {
+		//다른곳에선 사용하지 못해야 함.
+//		List<List<Lecture>> lectureLists = Lists.newArrayList();
+
+		Queue<UrlEntity> urlQueue = makeUrlQueue(year, season);
+		
+		//사용할 스레드 초기화
+		LectureMakeThread makeLectureThread[] = new LectureMakeThread[THREAD_COUNT];
+		for(int i = 0; i < THREAD_COUNT; i++)	{
+			makeLectureThread[i] = new LectureMakeThread(urlQueue);
+			makeLectureThread[i].start();
+		}
+		// 큐가 끝남을 알리기 위해서 넣음
+	
+	/*	UrlEntity urlEntity = new UrlEntity();
+		urlEntity.setSeason("ENDQUEUE");
+		synchronized(urlQueue){
+			urlQueue.add(urlEntity);
+			urlQueue.notifyAll();
+		}*/
+		
+		
+		//여기까지 오면 더이상 큐에 넣을게 없음.
+		
+		//모든 Thread가 종료됨.
+		for(int i = 0; i < THREAD_COUNT; i++)	{
+			try {
+				makeLectureThread[i].join();
+			} catch (InterruptedException e) {
+				LOG.debug("main interrupted", e);
+			}
+		}
+		
+//		for(int i = 0; i < THREAD_COUNT; i++)	{
+//			lectureDAO.saveClassInfoList(makeLectureThread[i].getLectureList());
+//		}
+		
+
+		// 모든게 끝나고 lectureLists가 만들어짐.
+
+
+//		for(List<Lecture> lectureList : lectureLists)	{
+			// list를 넣고
+			// 넣은걸 다시 빼고
+			
+//			하나씩 만들어서 PK를 가져오려고 함.
+//			for(Lecture lecture: lectureList)	{
+//				lectureDAO.saveClassInfoList(lecture);
+//			}
+//			lectureDAO.saveClassInfoList(lectureList);
+//		}
+		
+		List<LectureTime> timeList = makeTimeList(lectureDAO.getLectureList(new LectureSearchParam(year, season)));
+		
+		if(!timeList.isEmpty())	{
+			lectureDAO.saveClassTimeList(timeList);
 		}
 	}
 	
@@ -172,7 +234,6 @@ public class TableParsingBO {
 	public List<Category> makeCategoryList(String url, CampusMajorEnum campusMajor)	{
 		String htmlBody = httpClientBO.getHttpBody(url);
 		Matcher selectMatcher = makeMatcher(String.format(SELECT_TAG_REGEX, campusMajor.getMajorUrl()), htmlBody);
-		System.out.println(String.format(SELECT_TAG_REGEX, campusMajor.getMajorUrl()));
 		selectMatcher.find();
 		Matcher categoryMatcher = makeMatcher(OPTION_TAG_REGEX, selectMatcher.group(1));
 		List<Category> categories = Lists.newArrayList();
@@ -196,13 +257,9 @@ public class TableParsingBO {
 		List<Lecture> lectureList = Lists.newArrayList();
 		trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
 		
-		int lectureID = lectureDAO.getLastID() + 1;
-		
 		while (trMatcher.find()) {
 			Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
 			Lecture lecture = convertTdToLecture(tdMatcher,categoryId, year, season);
-			lecture.setLectureID(lectureID);
-			lectureID++;
 			lectureList.add(lecture);
 		}
 		return lectureList;
@@ -306,15 +363,170 @@ public class TableParsingBO {
 	 * 수강인원 저장
 	 */
 	public void saveAttending()	{
-		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
-			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
-			for(String categoryId : categoryCodes)	{
-				String url = String.format(DEFAULT_URL,
-					configDAO.getValue(YEAR), configDAO.getValue(SEASON), campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
-				String htmlBody = httpClientBO.getHttpBody(url);
-				
-				lectureDAO.saveAttending(convertTdToAttending(htmlBody));
-			}
+//		for(CampusMajorEnum campusMajor : CampusMajorEnum.values())	{
+//			List<String> categoryCodes = categoryDAO.getCatgCode(campusMajor.getCampus(), campusMajor.getMajorCode());
+//			for(String categoryId : categoryCodes)	{
+//				String url = String.format(DEFAULT_URL,
+//					configDAO.getValue(YEAR), configDAO.getValue(SEASON), campusMajor.getCampus(), campusMajor.getMajorCode(), campusMajor.getMajorUrl(), categoryId);
+//				String htmlBody = httpClientBO.getHttpBody(url);
+//				
+//				lectureDAO.saveAttending(convertTdToAttending(htmlBody));
+//			}
+//		}
+	}
+	
+	class UrlEntity	{
+		String year;
+		String season;
+		String categoryId;
+		CampusMajorEnum campusMajor;
+		
+		public UrlEntity()	{
+			
 		}
+		/**
+		 * @param year
+		 * @param season
+		 * @param categoryId
+		 * @param campusMajor
+		 */
+		public UrlEntity(String year, String season, String categoryId, CampusMajorEnum campusMajor) {
+			super();
+			this.year = year;
+			this.season = season;
+			this.categoryId = categoryId;
+			this.campusMajor = campusMajor;
+		}
+		
+		public String getYear() {
+			return year;
+		}
+		public void setYear(String year) {
+			this.year = year;
+		}
+		public String getSeason() {
+			return season;
+		}
+		public void setSeason(String season) {
+			this.season = season;
+		}
+		public String getCategoryId() {
+			return categoryId;
+		}
+		public void setCategoryId(String categoryId) {
+			this.categoryId = categoryId;
+		}
+		public CampusMajorEnum getCampusMajor() {
+			return campusMajor;
+		}
+		public void setCampusMajor(CampusMajorEnum campusMajor) {
+			this.campusMajor = campusMajor;
+		}
+	}
+	
+	class LectureMakeThread extends Thread	{
+		Queue<UrlEntity> urlQueue;
+		List<Lecture> lectureList;
+		
+		public LectureMakeThread(Queue<UrlEntity> urlQueue)	{
+			this.urlQueue = urlQueue;
+			lectureList = Lists.newArrayList();
+		}
+		
+		public List<Lecture> getLectureList()	{
+			return lectureList;
+		}
+		
+		public void run() {		
+			while(true)	{
+				UrlEntity urlEntity;
+				synchronized(urlQueue)	{
+					// 큐가 비어있으면 thread 끝내도록.
+					if(urlQueue.isEmpty())	{
+						break;
+					}
+					urlEntity = urlQueue.poll();
+				}
+
+				// 아래로는 urlEntity로 작업해서 lectureList에 넣는 부분
+				
+				String url = String.format(DEFAULT_URL,
+					urlEntity.getYear(), urlEntity.getSeason(), urlEntity.getCampusMajor().getCampus(),
+					urlEntity.getCampusMajor().getMajorCode(), urlEntity.getCampusMajor().getMajorUrl(), urlEntity.getCategoryId());
+				//httpBody 가져옴
+				String htmlBody = httpClientBO.getHttpBody(url);
+				htmlBody = htmlBody.replaceAll("<!--(.*?)-->", ""); //주석 제거
+				
+				Matcher trMatcher = makeMatcher(TR_TAG_REGEX,htmlBody);
+				
+				trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
+				
+				while (trMatcher.find()) {
+					Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
+					Lecture lecture = convertTdToLecture(tdMatcher, urlEntity.getCategoryId(), urlEntity.getYear(), urlEntity.getSeason());
+					lectureList.add(lecture);
+				}
+			}
+			lectureDAO.saveClassInfoList(this.lectureList);	
+		}
+	}
+	
+	class LectureMakeRunnable implements Runnable	{
+		Queue<UrlEntity> urlQueue;
+		List<Lecture> lectureList;
+		
+		public LectureMakeRunnable(Queue<UrlEntity> urlQueue)	{
+			this.urlQueue = urlQueue;
+			lectureList = Lists.newArrayList();
+		}
+
+		public LectureMakeRunnable() {
+		}
+		/**
+		 * 
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			while(true)	{
+				UrlEntity urlEntity;
+				synchronized(urlQueue)	{
+					if(urlQueue.isEmpty())	{
+						try {
+							if(urlQueue.peek() == null) 
+							urlQueue.wait();
+						} catch (InterruptedException e) {
+							// 예외 처리
+							LOG.debug("thread run : ", e);
+						}
+					}
+					urlEntity = urlQueue.peek();
+					if(urlEntity.getSeason() == "ENDQUEUE")	{
+						break;
+					}
+					urlQueue.poll();
+					// 비어있나 위에서 검사하기 때문에 poll사용
+				}
+				String url = String.format(DEFAULT_URL,
+					urlEntity.getYear(), urlEntity.getSeason(), urlEntity.getCampusMajor().getCampus(),
+					urlEntity.getCampusMajor().getMajorCode(), urlEntity.getCampusMajor().getMajorUrl(), urlEntity.getCategoryId());
+				//httpBody 가져옴
+				String htmlBody = httpClientBO.getHttpBody(url);
+				htmlBody = htmlBody.replaceAll("<!--(.*?)-->", ""); //주석 제거
+				
+				Matcher trMatcher = makeMatcher(TR_TAG_REGEX,htmlBody);
+				
+				trMatcher.find(); // 제목 표시하는 줄 넘어가기 위해서
+				
+				while (trMatcher.find()) {
+					Matcher tdMatcher = makeMatcher(TD_TAG_REGEX, trMatcher.group(2));
+					Lecture lecture = convertTdToLecture(tdMatcher, urlEntity.getCategoryId(), urlEntity.getYear(), urlEntity.getSeason());
+					lectureList.add(lecture);
+				}
+			}
+			
+		}
+		
 	}
 }

@@ -7,7 +7,7 @@
 	    	SELECT major as major, stud_num as studentNum, email as email,
 	    	user_level as userLevel, sex as sex
 			FROM hufs_user
-	        WHERE email = #email# AND passwd = #passwd#
+	        WHERE stud_num = #studentNum# AND passwd = #passwd#
 	</select>
 	
 	<insert id="join" parameterClass="User">

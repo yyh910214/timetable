@@ -30,6 +30,14 @@
       <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="email">
     </div>
   </div>
+  
+<!--   <div class="form-group"> -->
+<!--     <label for="studentNum" class="col-sm-2 control-label">ÇÐ¹ø</label> -->
+<!--     <div class="col-sm-10"> -->
+<!--       <input type="text" class="form-control" id="studentNum" placeholder="studentNum" name="studentNum"> -->
+<!--     </div> -->
+<!--   </div> -->
+  
   <div class="form-group">
     <label for="inputPassword" class="col-sm-2 control-label">Password</label>
     <div class="col-sm-10">

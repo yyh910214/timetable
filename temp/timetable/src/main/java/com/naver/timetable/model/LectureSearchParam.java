@@ -20,6 +20,15 @@ public class LectureSearchParam extends PageInfo{
 	private List<String> schedule;
 	private String cyber;
 	private String forNative;
+	
+	public LectureSearchParam(String year, String season)	{
+		this.lectureSeason = season;
+		this.lectureYear = year;
+	}
+	
+	public LectureSearchParam()	{
+		
+	}
 
 	public List<String> getCategory() {
 		return category;

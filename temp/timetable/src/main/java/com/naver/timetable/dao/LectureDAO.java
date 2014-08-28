@@ -28,13 +28,17 @@ public class LectureDAO {
 	@Qualifier("hufsCubrid")
 	SqlMapClientTemplate hufsCubrid;
 	
-	public List<Lecture> searchLecture(LectureSearchParam searchParam)	{
-		return hufsCubrid.queryForList("searchLecture", searchParam);
+	public List<Lecture> getLectureList(LectureSearchParam searchParam)	{
+		return hufsCubrid.queryForList("getLectureList", searchParam);
 	}
 	
-	public void saveClassInfoList(List<Lecture> classInfos)	{
-		hufsCubrid.insert("saveLectureList", classInfos);
+	public Object saveClassInfoList(List<Lecture> classInfos)	{
+		return hufsCubrid.insert("saveLectureList", classInfos);
 	}
+	
+//	public void saveClassInfoList(Lecture classInfos)	{
+//		hufsCubrid.insert("saveLectureList", classInfos);
+//	}
 	
 	public void saveClassTimeList(List<LectureTime> timeList)	{
 		hufsCubrid.insert("saveTimeList", timeList);

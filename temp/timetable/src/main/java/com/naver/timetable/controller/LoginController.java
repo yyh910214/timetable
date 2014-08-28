@@ -54,8 +54,6 @@ public class LoginController {
 			String targetPage = session.getAttribute("targetPage") == null ? "/lecture/index" : (String)session.getAttribute("targetPage"); 
 			return new ModelAndView("redirect:"+ targetPage);
 		} else {
-			System.out.println("qwe");
-			System.out.println(retryMessage);
 			return  new ModelAndView("login").addObject("retryMessage", retryMessage);
 		}
 	}

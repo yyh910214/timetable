@@ -23,10 +23,23 @@ import com.naver.timetable.model.User;
  */
 @Service
 public class LoginBO {
+	private static final String loginUrl = "https://eclass2.hufs.ac.kr:4443/ilos/lo/login.acl";
 	@Autowired
 	UserDAO userDAO;
 	
+	@Autowired
+	HttpClientBO httpClientBO;
+	
 	public boolean login(LoginInfo loginInfo, HttpServletRequest request)	{
+		
+//		http client를 만들어서 http://eclass2.hufs.ac.kr:8181/ilos/lo/login_branch.acl로 요청 보냄
+		
+		
+//		List<NameValuePair> loginParam = Lists.newArrayList();
+//		loginParam.add(new BasicNameValuePair("usr_id", loginInfo.getStudentNum()));
+//		loginParam.add(new BasicNameValuePair("usr_pwd", loginInfo.getPasswd()));
+//		System.out.println(httpClientBO.getHttpBody(loginUrl, "POST", loginParam).length());
+
 		User user = userDAO.login(loginInfo);
 		if(user != null)	{
 			HttpSession session = request.getSession();

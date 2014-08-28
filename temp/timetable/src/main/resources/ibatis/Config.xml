@@ -3,17 +3,17 @@
     "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap>
-    <insert id="insertConfig" parameterClass="java.util.Map">	
+    <insert id="insertSeason" parameterClass="Map">	
     	INSERT
-    	INTO hufs_config
+    	INTO hufs_season
     	VALUES
-    	(#key#, #value#)
+    	(#year#, #season#)
     </insert>
     
-    <select id="getConfig" parameterClass="java.lang.String" resultClass="java.lang.String">
-    	SELECT "value"
-    	FROM hufs_config
-    	WHERE "key"=#key#
+    <select id="isExistSeason" parameterClass="Map" resultClass="Integer">
+    	SELECT COUNT(*)
+    	FROM hufs_season
+    	WHERE lecture_year=#year# AND lecture_season=#season#
     </select>
 
 </sqlMap>

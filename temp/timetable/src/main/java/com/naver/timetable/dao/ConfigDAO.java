@@ -25,14 +25,17 @@ public class ConfigDAO {
 	@Qualifier("hufsCubrid")
 	SqlMapClientTemplate hufsCubrid;
 	
-	public String getValue(String key)	{
-		return (String)hufsCubrid.queryForObject("getConfig", key);
+	public void insertSeason(String year, String season)	{
+		Map<String, String> parameterMap = Maps.newHashMap();
+		parameterMap.put("year", year);
+		parameterMap.put("season", season);
+		hufsCubrid.insert("insertSeason", parameterMap);
 	}
 	
-	public void insertConfig(String key, String value)	{
+	public int isExistSeason(String year, String season)	{
 		Map<String, String> parameterMap = Maps.newHashMap();
-		parameterMap.put("key", key);
-		parameterMap.put("value", value);
-		hufsCubrid.insert("insertConfig", parameterMap);
+		parameterMap.put("year", year);
+		parameterMap.put("season", season);
+		return (Integer)hufsCubrid.queryForObject("isExistSeason", parameterMap);
 	}
 }

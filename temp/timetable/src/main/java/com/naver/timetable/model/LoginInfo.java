@@ -11,9 +11,16 @@ package com.naver.timetable.model;
  * @author younghan
  */
 public class LoginInfo {
+	private String studentNum;
 	private String email;
 	private String passwd;
 	
+	public String getStudentNum() {
+		return studentNum;
+	}
+	public void setStudentNum(String studentNum) {
+		this.studentNum = studentNum;
+	}
 	public String getEmail() {
 		return email;
 	}

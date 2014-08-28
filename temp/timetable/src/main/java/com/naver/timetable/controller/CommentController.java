@@ -10,7 +10,6 @@ package com.naver.timetable.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +23,7 @@ import com.naver.timetable.model.CommentSearchParam;
 import com.naver.timetable.model.CommentWithLecture;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.User;
+import com.naver.timetable.resolver.SessionUser;
 
 /**
  * @author younghan
@@ -47,10 +47,9 @@ public class CommentController {
 	}
 	
 	@RequestMapping(value = "commentForm")
-	public ModelAndView commentForm(HttpServletRequest request, String lectureID)	{
+	public ModelAndView commentForm(@SessionUser User user, String lectureID)	{
 		ModelAndView mv = new ModelAndView("commentForm");
-		HttpSession session = request.getSession();
-		Comment comment = commentBO.getComment((User)session.getAttribute("user"), lectureID);
+		Comment comment = commentBO.getComment(user, lectureID);
 		Lecture commentLecture = lectureBO.getLecture(lectureID);
 		if (comment != null)	{
 			// 기존에 해당 과목에 대한 댓글을 달았던 경우

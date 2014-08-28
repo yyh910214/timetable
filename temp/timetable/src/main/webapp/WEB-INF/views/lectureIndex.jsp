@@ -18,9 +18,22 @@
 <script src="/js/jAutoCheckList/jAutochecklist.min.js"></script>
 <script src="/js/jAutoCheckList/bootstrap/bootstrap.min.js"></script>
 <script src="/js/jAutoCheckList/script.js"></script>
+<script src="/js/jquery.tmpl.min.js"></script>
+<script type="text/x-jquery-template" id="tableTemplate">
+<tr>
+<td><a target='_blank' href='/comment/commentList?lectureID=${'$'}{lectureID}'>${'$'}{lectureNum}</a></td>	
+<td><a target='_blank' href='http://webs.hufs.ac.kr:8989${'$'}{url}'>${'$'}{lectureName}</a></td>
+<td>${'$'}{grade}</td>
+<td>${'$'}{prof}</td>
+<td>${'$'}{point}</td>
+<td>${'$'}{room}</td>
+<td>${'$'}{cyber}</td>
+<td>${'$'}{forNative}</td>
+<td><a target='_blank' href='/timetable/addTimetable?lectureID=${'$'}{lectureID}&year=${'$'}{lectureYear}&season=${'$'}{lectureSeason}'>선택</a></td>
+</tr>
+</script>
 <script type="text/javascript">
 	function searchLecture() {
-
 		var showTable = function(res) {
 			var lectureTable = $('#lecture');
 			lectureTable.empty();
@@ -28,38 +41,7 @@
 				lectureTable.append("<tr>"
 						+ "<td colspan='9'> 검색 결과가 앖습니다. </td>" + "</tr>");
 			} else {
-				for (var idx = 0; idx < res.length; idx++) {
-					lectureTable
-							.append("<tr>"
-									+ "<td><a target='_blank' href='/comment/commentList?lectureID="
-									+ res[idx].lectureID
-									+ "'>"
-									+ res[idx].lectureNum
-									+ "</a></td>"	
-									+ "<td><a target='_blank' href='http://webs.hufs.ac.kr:8989" + res[idx].url + "'>"
-									+ res[idx].lectureName
-									+ "</a></td>"
-									+ "<td>"
-									+ res[idx].grade
-									+ "</td>"
-									+ "<td>"
-									+ res[idx].prof
-									+ "</td>"
-									+ "<td>"
-									+ res[idx].point
-									+ "</td>"
-									+ "<td>"
-									+ res[idx].room
-									+ "</td>"
-									+ "<td>"
-									+ res[idx].cyber
-									+ "</td>"
-									+ "<td>"
-									+ res[idx].forNative
-									+ "</td>"
-									+ "<td><a target='_blank' href='/timetable/addTimetable?lectureID="
-									+ res[idx].lectureID + "&year=" +res[idx].lectureYear + "&season="+ res[idx].lectureSeason + "'>선택</a></td>" + "</tr>");
-				}
+				$("#tableTemplate").tmpl(res).appendTo(lectureTable);	
 			}
 		};
 		var points = new Array();
@@ -67,6 +49,8 @@
 			points.push($(this).val());
 		});
 		var searchParam = {
+			"lectureYear"	: $("select[name='lectureYear']").val(),
+			"lectureSeason"	: $("select[name='lectureSeason']").val(),
 			"category" : $('#category').jAutochecklist('get'),
 			"schedule" : $('#schedule').jAutochecklist('get'),
 			"point" : points,
@@ -124,7 +108,7 @@
 			</label> <label class="checkbox-inline"> <input type="checkbox"
 					name="cyber"> 사이버
 			</label></td>
-			<td rowspan="2"><input type=button
+			<td rowspan="3"><input type=button
 				onclick="javascript:searchLecture();return false;" value="확인">
 			</td>
 		</tr>
@@ -153,6 +137,30 @@
 						</c:forEach>
 					</c:forEach>
 				</ul>
+			</td>
+		</tr>
+		<tr>
+			<th class="text-center">년도 </th>
+			<td>
+				<select name="lectureYear">
+<%-- 						<c:forEach var="year" varStatus="idx" items="${years}"> --%>
+<%-- 							<option value="${year}">${year}</option> --%>
+<%-- 						</c:forEach> --%>
+					<option value="2011">2011년도</option>
+					<option value="2012">2012년도</option>
+					<option value="2013">2013년도</option>
+					<option value="2014">2014년도</option>
+				</select>
+			</td>
+				
+			<th class="text-center">학기</th>
+			<td>
+				<select name="lectureSeason">
+					<option value="1">1학기</option>
+					<option value="2">여름학기</option>
+					<option value="3">2학기</option>
+					<option value="4">겨울학기</option>
+				</select>
 			</td>
 		</tr>
 	</table>

@@ -13,7 +13,7 @@
     	FROM hufs_lecture
     	WHERE lecture_id=#lectureID#
   	</select>
-    <select id="searchLecture" parameterClass="com.naver.timetable.model.LectureSearchParam" resultClass="Lecture">	
+    <select id="getLectureList" parameterClass="com.naver.timetable.model.LectureSearchParam" resultClass="Lecture">	
     	SELECT hufs_lecture.lecture_id as lectureID, lecture_num as lectureNum,
     		lecture_name as lectureName, room as room,
     		grade as grade, prof as prof, point as point,
@@ -46,15 +46,24 @@
        
     </select>
 	
-    <insert id="saveLectureList" parameterClass="java.util.List">	
+    <insert id="saveLectureList" parameterClass="java.util.List">
     	INSERT
-    	INTO hufs_lecture
+    	INTO hufs_lecture(lecture_num, lecture_name, grade, point, prof, room, cyber, native, url, catg_id, lecture_year, lecture_season)
     	VALUES
 		<iterate conjunction=",">
-			(#[].lectureID#, #[].lectureNum#, #[].lectureName#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#, #[].lectureYear#, #[].lectureSeason#)
+			(#[].lectureNum#, #[].lectureName#, #[].grade#, #[].point#, #[].prof#, #[].room#, #[].cyber#, #[].forNative#, #[].url#, #[].catgId#, #[].lectureYear#, #[].lectureSeason#)
 		</iterate>
     </insert>
     
+<!--     <insert id="saveLectureList" parameterClass="Lecture"> -->
+<!-- 	   	<selectKey keyProperty="lectureID" resultClass="int"> -->
+<!-- 	   		SELECT hufs_lecture_ai_lecture_id.NEXT_VALUE -->
+<!-- 	   	</selectKey> -->
+<!-- 	   	INSERT -->
+<!-- 	   	INTO hufs_lecture(lecture_id, lecture_num, lecture_name, grade, point, prof, room, cyber, native, url, catg_id, lecture_year, lecture_season) -->
+<!-- 	   	VALUES -->
+<!-- 		(#lectureID#, #lectureNum#, #lectureName#, #grade#, #point#, #prof#, #room#, #cyber#, #forNative#, #url#, #catgId#, #lectureYear#, #lectureSeason#) -->
+<!--     </insert> -->
     
     <insert id="saveTimeList" parameterClass="List">	
     	INSERT

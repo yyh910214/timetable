@@ -26,7 +26,7 @@ public class LectureBO {
 	LectureDAO lectureDAO;
 	
 	public List<Lecture> searchLecture(LectureSearchParam searchParam)	{
-		return lectureDAO.searchLecture(searchParam);
+		return lectureDAO.getLectureList(searchParam);
 	}
 	
 	public List<LectureAttending> getAttendingList(String lectureNum)	{

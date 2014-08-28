@@ -50,4 +50,8 @@ public class CategoryDAO {
 	public List<Category> getAllCategory()	{
 		return hufsCubrid.queryForList("getAllCategory");
 	}
+	
+	public int getCategoryCount()	{
+		return (Integer)hufsCubrid.queryForObject("getCategoryCount");
+	}
 }

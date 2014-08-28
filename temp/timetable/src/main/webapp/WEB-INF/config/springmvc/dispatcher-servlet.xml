@@ -21,6 +21,10 @@
 
 	<!-- Configures support for @Controllers -->
 	<mvc:annotation-driven content-negotiation-manager="contentManager">
+		<mvc:argument-resolvers>
+            <bean class="com.naver.timetable.resolver.UserHandlerMethodArgumentResolver"></bean>     
+        </mvc:argument-resolvers>
+	
 	</mvc:annotation-driven>
 
 	
