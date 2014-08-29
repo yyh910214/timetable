@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.naver.timetable.bo.CategoryBO;
 import com.naver.timetable.bo.LoginBO;
 import com.naver.timetable.model.LoginInfo;
 import com.naver.timetable.model.User;
@@ -36,6 +37,9 @@ public class LoginController {
 	@Autowired
 	LoginBO loginBO;
 	
+	@Autowired
+	CategoryBO categoryBO;
+	
 	@RequestMapping(value="login", method=RequestMethod.GET)
 	public ModelAndView login(Model model) 	{
 		return new ModelAndView("login");
@@ -50,12 +54,25 @@ public class LoginController {
 	@RequestMapping(value="login", method=RequestMethod.POST)
 	public ModelAndView login(LoginInfo loginInfo, HttpServletRequest request)	{
 		HttpSession session = request.getSession();
-		if (loginBO.login(loginInfo, request))	{
-			String targetPage = session.getAttribute("targetPage") == null ? "/lecture/index" : (String)session.getAttribute("targetPage"); 
-			return new ModelAndView("redirect:"+ targetPage);
-		} else {
-			return  new ModelAndView("login").addObject("retryMessage", retryMessage);
+		ModelAndView mv;
+		switch(loginBO.login(loginInfo, request))	{
+			case LoginBO.LOGIN_SUCCESS :
+				String targetPage = session.getAttribute("targetPage") == null ? "/lecture/index" : (String)session.getAttribute("targetPage"); 
+				mv = new ModelAndView("redirect:"+ targetPage);
+				break;
+				
+				//처음 이용하는 사용자의 경우
+			case LoginBO.FIRST_LOGIN :
+				mv = new ModelAndView("join");
+				mv.addObject("majorCategories", categoryBO.getMajorCategories());
+				mv.addObject("studentNum", loginInfo.getStudentNum());
+				break;
+				
+			case LoginBO.LOGIN_FAILED :
+			default :
+				mv = new ModelAndView("login").addObject("retryMessage", retryMessage);
 		}
+		return mv;
 	}
 	
 	@RequestMapping(value="logout")
@@ -64,23 +81,11 @@ public class LoginController {
 		return new ModelAndView("login").addObject("logoutMessage", logoutMessage);
 	}
 	
-	@RequestMapping(value="join", method=RequestMethod.GET)
-	public ModelAndView join(HttpServletRequest request)	{
-		return new ModelAndView("join");
-	}
-	
 	@RequestMapping(value="join", method=RequestMethod.POST)
-	public ModelAndView join(HttpServletRequest request, User user, String passwd)	{
-		loginBO.join(request, user, passwd);
+	public ModelAndView join(HttpServletRequest request, User user)	{
+		System.out.println(user.getStudentNum());
+		loginBO.join(user, request);
 		return new ModelAndView("redirect:/lecture/index");
 	}
-	
-	@RequestMapping(value="searchPasswd", method=RequestMethod.GET)
-	public ModelAndView searchPasswd(Model model)	{
-		return new ModelAndView("searchPasswd");
-	}
-	@RequestMapping(value="changePasswd")
-	public void changePasswd(Model model)	{
-		
-	}
+
 }

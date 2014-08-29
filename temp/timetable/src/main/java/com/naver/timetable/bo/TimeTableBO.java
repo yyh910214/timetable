@@ -43,9 +43,6 @@ public class TimeTableBO {
 	 */
 	public boolean addTimeTable(String studentNum, String lectureID, String year, String season)	{
 		List<String> lectureTimes = lectureDAO.getLectureTime(lectureID);	// 넣고자 하는 강의의 시간을 가져옴.
-		for(String temp : lectureTimes)	{
-			System.out.println("sdf" + temp);
-		}
 		if ( ((lectureTimes.isEmpty()) ||
 			//0일 경우 checkTimeTable은 실행되지 않는다.
 			(timeTableDAO.checkTimeTable(studentNum, year, season, lectureTimes) == 0))

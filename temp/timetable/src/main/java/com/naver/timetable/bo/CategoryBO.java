@@ -41,4 +41,8 @@ public class CategoryBO {
 		}
 		return result;
 	}
+	
+	public List<Category> getMajorCategories()	{
+		return categoryDAO.getMajorCategories();
+	}
 }

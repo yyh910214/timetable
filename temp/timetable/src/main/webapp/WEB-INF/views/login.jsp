@@ -24,19 +24,19 @@
 		${retryMessage}
 	</c:if>
 	<form class="form-horizontal" role="form" action="/login/login" method="post">
-  <div class="form-group">
-    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
-    <div class="col-sm-10">
-      <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="email">
-    </div>
-  </div>
-  
 <!--   <div class="form-group"> -->
-<!--     <label for="studentNum" class="col-sm-2 control-label">학번</label> -->
+<!--     <label for="inputEmail3" class="col-sm-2 control-label">Email</label> -->
 <!--     <div class="col-sm-10"> -->
-<!--       <input type="text" class="form-control" id="studentNum" placeholder="studentNum" name="studentNum"> -->
+<!--       <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="email"> -->
 <!--     </div> -->
 <!--   </div> -->
+  
+  <div class="form-group">
+    <label for="studentNum" class="col-sm-2 control-label">학번</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="studentNum" placeholder="studentNum" name="studentNum">
+    </div>
+  </div>
   
   <div class="form-group">
     <label for="inputPassword" class="col-sm-2 control-label">Password</label>

@@ -21,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.naver.timetable.bo.CategoryBO;
 import com.naver.timetable.bo.LectureBO;
 import com.naver.timetable.bo.TableParsingBO;
-import com.naver.timetable.bo.ThreadTestBO;
 import com.naver.timetable.model.Lecture;
 import com.naver.timetable.model.LectureSearchParam;
 
@@ -37,8 +36,6 @@ public class LectureController {
 	@Autowired
 	CategoryBO categoryBO;
 	
-	@Autowired
-	ThreadTestBO threadTestBO;
 	
 	@RequestMapping(value = "/index")
 	public ModelAndView index(HttpServletRequest request)	{
@@ -47,7 +44,7 @@ public class LectureController {
 		mv.addObject("weekdays", TableParsingBO.WEEKDAY);
 		return mv;
 	}
-	
+	m
 	@RequestMapping(value = "/searchLecture", produces=	{"text/html", "application/json"})
 	@ResponseBody
 	public List<Lecture> searchLecture(HttpServletRequest request, @RequestBody LectureSearchParam searchParam)	{

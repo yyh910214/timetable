@@ -45,5 +45,14 @@
 		DELETE
 		FROM hufs_category
 	</delete>
+	
+	<select id="getMajorCategories" resultClass="Category">
+		SELECT catg_id as categoryId,
+    	catg_name as categoryName,
+    	campus_code as categoryCampus,
+    	gubun as categoryGubun
+    	FROM hufs_category
+    	WHERE gubun=1
+	</select>
 
 </sqlMap>

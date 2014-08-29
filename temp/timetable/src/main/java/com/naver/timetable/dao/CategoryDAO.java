@@ -54,4 +54,10 @@ public class CategoryDAO {
 	public int getCategoryCount()	{
 		return (Integer)hufsCubrid.queryForObject("getCategoryCount");
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<Category> getMajorCategories()	{
+		return hufsCubrid.queryForList("getMajorCategories");
+	}
 }

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"
 	pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -23,21 +24,20 @@
 				<label class="col-sm-2 control-label" for="email">Email : </label> <input class="col-sm-10" type="email"
 					class="form-control" name="email" id="email"
 					placeholder="email을 입력하세요" required>
-
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label" for="passwd">비밀번호 :</label> <input type="password"
-					name="passwd" id="passwd" placeholder="비밀번호" required> <label
-					for="passwd_confirm">비밀번호 확인 :</label> <input type="password"
-					name="passwd_confirm" id="passwd_confirm" placeholder="비민벌호확인" required>
-
 			</div>
 
 			<div class="form-group">
 			<label class="col-sm-2 control-label" for="major" >전공 :</label>
-				<input class="col-sm-10" type="text" id="major" name="major" placeholder="전공" required>
-			<label for="studNum">학번 :</label>	
-				<input type="text" id="studNum" name="studNum" placeholder="학번" required>
+				<select id="major" name="major">
+					<c:forEach var="majorCategory" varStatus="idx" items="${majorCategories}">
+						<option value="${majorCategory.categoryId}">${majorCategory.categoryName}</option>
+					</c:forEach>
+				</select>
+			</div>
+			
+			<div class="form-group">
+			<label class="col-sm-2 control-label" for="studentNum">학번 :</label>
+				<input type="text" id="studentNum" name="studentNum" value="${studentNum}" placeholder="학번" readonly>
 			</div>
 
 			<div>
@@ -46,6 +46,7 @@
 						checked />여자</label><label><input type="radio"
 						name="sex" value="MALE" />남자</label>
 			</div>
+			
 			<button type="submit" class="btn btn-default">가입</button>
 		</form>
 

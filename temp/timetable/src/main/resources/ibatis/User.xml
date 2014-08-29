@@ -3,11 +3,11 @@
     "http://ibatis.apache.org/dtd/sql-map-2.dtd">
 
 <sqlMap>
-	<select id="login" parameterClass="LoginInfo" resultClass="User">	
+	<select id="login" parameterClass="String" resultClass="User">	
 	    	SELECT major as major, stud_num as studentNum, email as email,
 	    	user_level as userLevel, sex as sex
 			FROM hufs_user
-	        WHERE stud_num = #studentNum# AND passwd = #passwd#
+	        WHERE stud_num = #studentNum#
 	</select>
 	
 	<insert id="join" parameterClass="User">

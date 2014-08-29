@@ -50,10 +50,7 @@ public class TableParsingBO {
 	private static final String SPLIT_ANCHOR_REGEX = "\"([\\S]*?)\">([\\S\\s]*)<\\/a>";
 	private static final String SELECT_TAG_REGEX = "<select name=\"%s\"([\\s\\S]*?)<\\/select>";
 	private static final String OPTION_TAG_REGEX = "value[\\s]?=\"(\\S*?)\">([\\S\\s]*?)<\\/option>";
-	
-	private static final String YEAR = "year";
-	private static final String SEASON = "season";
-	
+
 	private static final int THREAD_COUNT = 10;
 	
 	public static final Map<String, String> WEEKDAY = new ImmutableMap.Builder<String, String>()
@@ -108,8 +105,6 @@ public class TableParsingBO {
 	}
 
 	public void saveTimeTable(String year, String season) {
-		//다른곳에선 사용하지 못해야 함.
-//		List<List<Lecture>> lectureLists = Lists.newArrayList();
 
 		Queue<UrlEntity> urlQueue = makeUrlQueue(year, season);
 		
@@ -121,15 +116,6 @@ public class TableParsingBO {
 		}
 		// 큐가 끝남을 알리기 위해서 넣음
 	
-	/*	UrlEntity urlEntity = new UrlEntity();
-		urlEntity.setSeason("ENDQUEUE");
-		synchronized(urlQueue){
-			urlQueue.add(urlEntity);
-			urlQueue.notifyAll();
-		}*/
-		
-		
-		//여기까지 오면 더이상 큐에 넣을게 없음.
 		
 		//모든 Thread가 종료됨.
 		for(int i = 0; i < THREAD_COUNT; i++)	{
@@ -140,24 +126,6 @@ public class TableParsingBO {
 			}
 		}
 		
-//		for(int i = 0; i < THREAD_COUNT; i++)	{
-//			lectureDAO.saveClassInfoList(makeLectureThread[i].getLectureList());
-//		}
-		
-
-		// 모든게 끝나고 lectureLists가 만들어짐.
-
-
-//		for(List<Lecture> lectureList : lectureLists)	{
-			// list를 넣고
-			// 넣은걸 다시 빼고
-			
-//			하나씩 만들어서 PK를 가져오려고 함.
-//			for(Lecture lecture: lectureList)	{
-//				lectureDAO.saveClassInfoList(lecture);
-//			}
-//			lectureDAO.saveClassInfoList(lectureList);
-//		}
 		
 		List<LectureTime> timeList = makeTimeList(lectureDAO.getLectureList(new LectureSearchParam(year, season)));
 		

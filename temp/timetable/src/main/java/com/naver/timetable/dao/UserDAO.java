@@ -27,8 +27,8 @@ public class UserDAO {
 	@Qualifier("hufsCubrid")
 	SqlMapClientTemplate hufsCubrid;
 	
-	public User login(LoginInfo loginInfo)	{
-		return (User)hufsCubrid.queryForObject("login", loginInfo); 
+	public User login(String studentNum)	{
+		return (User)hufsCubrid.queryForObject("login", studentNum); 
 	}
 	
 	public void join(User user)	{

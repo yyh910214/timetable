@@ -12,14 +12,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.stereotype.Service;
-
 import com.google.common.collect.Lists;
 
 /**
  * @author younghan
  */
-@Service
 public class ThreadTestBO {
 	public static void main(String[] args) {
 		ThreadTestBO test = new ThreadTestBO();  
